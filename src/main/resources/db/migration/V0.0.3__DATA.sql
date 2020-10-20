@@ -1,0 +1,3 @@
+INSERT INTO role(role) VALUES('ADMIN');
+INSERT INTO role(role) VALUES('CUSTOMER');
+INSERT INTO role(role) VALUES('TRAINER');
