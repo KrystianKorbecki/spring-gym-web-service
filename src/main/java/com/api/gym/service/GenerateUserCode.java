@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import java.util.Random;
 
 @Service
-public class GenerateRandomChar
+public class GenerateUserCode
 {
     private Random random = new Random();
 

@@ -1,14 +1,15 @@
 package com.api.gym.repository;
 
-import com.api.gym.entity.Role;
-import org.springframework.boot.autoconfigure.data.ConditionalOnRepositoryType;
+
+import com.api.gym.models.ERole;
+import com.api.gym.models.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashSet;
+import java.util.Optional;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long>
 {
-    Role findByName(String role);
+	Optional<Role> findByName(ERole name);
 }

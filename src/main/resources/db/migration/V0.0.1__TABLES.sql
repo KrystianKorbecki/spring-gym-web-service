@@ -1,16 +1,16 @@
 CREATE TABLE "user"
 (
-    "id_user" bigserial NOT NULL,
-    "name" varchar(50),
+    "id" bigserial NOT NULL,
+    "user_name" varchar(50),
     "last_name" varchar(50),
     "phone_number" char(12),
     "email_address" varchar(100) NOT NULL UNIQUE,
-    "password" varchar(300) NOT NULL,
-    "create_date" DATE NOT NULL,
+    "password" varchar(400) NOT NULL,
+    "create_date" DATE,
     "code" varchar(8) UNIQUE,
     "id_trainer" bigint,
     "id_admin" bigint,
-    CONSTRAINT "user_pk" PRIMARY KEY ("id_user")
+    CONSTRAINT "user_pk" PRIMARY KEY ("id")
 ) WITH (
       OIDS=FALSE
     );
@@ -19,9 +19,9 @@ CREATE TABLE "user"
 
 CREATE TABLE "role"
 (
-    "id_role" serial NOT NULL,
-    "role" varchar(20) NOT NULL,
-    CONSTRAINT "role_pk" PRIMARY KEY ("id_role")
+    "id" serial NOT NULL,
+    "name" varchar(20) NOT NULL,
+    CONSTRAINT "role_pk" PRIMARY KEY ("id")
 ) WITH (
       OIDS=FALSE
     );

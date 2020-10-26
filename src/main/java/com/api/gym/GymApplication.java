@@ -1,51 +1,46 @@
 package com.api.gym;
 
-import com.api.gym.model.UserRequest;
-import com.api.gym.service.RegistrationService;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import com.api.gym.payload.request.SignupRequest;
+import com.api.gym.service.AuthService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.PostConstruct;
+import java.util.HashSet;
+import java.util.Set;
 
 @SpringBootApplication
 @EnableJpaRepositories("com.api.gym.repository")
 public class GymApplication
 {
-    @Autowired
-    RegistrationService registrationService;
+    AuthService authService;
+    GymApplication(AuthService authService)
+    {
+        this.authService = authService;
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(GymApplication.class, args);
     }
 
     @PostConstruct
-    public void initusers()
+    public void inituser()
     {
-        UserRequest userRequest = new UserRequest();
-        userRequest.setEmailAddress("admin@admin.pl");
-        userRequest.setLastName("Admin");
-        userRequest.setName("Admin");
-        userRequest.setPassword("password");
-        userRequest.setRole("ADMIN");
-        registrationService.createUser(userRequest);
+        Set<String> roles = new HashSet<String>();
+        roles.add("admin");
+        SignupRequest signupRequest = new SignupRequest();
+        signupRequest.setEmail("admin@admin.pl");
+        signupRequest.setLastName("Admin");
+        signupRequest.setUsername("Admin");
+        signupRequest.setPassword("password");
+        signupRequest.setRole(roles);
+        signupRequest.setPhoneNumber("234567821");
+        authService.registerUser(signupRequest);
     }
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer()
-    {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry)
-            {
-                registry.addMapping("/*").allowedHeaders("*").allowedOrigins("*").allowCredentials(true);
-            }
-        };
-    }
 
 
 }
