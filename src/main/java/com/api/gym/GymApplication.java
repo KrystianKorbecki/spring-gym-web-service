@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.annotation.PostConstruct;
 import java.util.HashSet;
@@ -29,7 +30,7 @@ public class GymApplication
     @PostConstruct
     public void inituser()
     {
-        Set<String> roles = new HashSet<String>();
+        Set<String> roles = new HashSet<>();
         roles.add("admin");
         SignupRequest signupRequest = new SignupRequest();
         signupRequest.setEmail("admin@admin.pl");

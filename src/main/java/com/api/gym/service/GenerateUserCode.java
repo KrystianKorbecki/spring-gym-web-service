@@ -1,5 +1,6 @@
 package com.api.gym.service;
 
+import com.api.gym.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
@@ -7,6 +8,11 @@ import java.util.Random;
 @Service
 public class GenerateUserCode
 {
+    UserRepository userRepository;
+    GenerateUserCode(UserRepository userRepository)
+    {
+        this.userRepository = userRepository;
+    }
     private Random random = new Random();
 
     public String Generate(int size)
@@ -17,6 +23,13 @@ public class GenerateUserCode
             int decimalValue = random.nextInt(74)+48;
             asciiValue = asciiValue + Character.toString((char) decimalValue);
         }
-        return asciiValue;
+        if(userRepository.existsByCode(asciiValue) == true)
+        {
+            Generate(size);
+            return "";
+        }
+
+        else
+            return asciiValue;
     }
 }

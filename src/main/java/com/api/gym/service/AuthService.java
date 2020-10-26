@@ -1,5 +1,6 @@
 package com.api.gym.service;
 
+import com.api.gym.exceptions.RoleNotFoundException;
 import com.api.gym.models.ERole;
 import com.api.gym.models.Role;
 import com.api.gym.models.User;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -58,7 +60,7 @@ public class AuthService
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
+                .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(new JwtResponse(jwt,
@@ -92,35 +94,33 @@ public class AuthService
             if (strRoles == null)
             {
                 Role userRole = roleRepository.findByName(ERole.ROLE_BASIC)
-                        .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_BASIC.toString()));
                 roles.add(userRole);
             }
             else
             {
                 strRoles.forEach(role -> {
                     switch (role) {
-                        case "admin":
+                        case "admin" -> {
                             Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                                    .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_ADMIN.toString()));
                             roles.add(adminRole);
-
-                            break;
-                        case "trainer":
+                        }
+                        case "trainer" -> {
                             Role trainerRole = roleRepository.findByName(ERole.ROLE_TRAINER)
-                                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                                    .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINER.toString()));
                             roles.add(trainerRole);
-
-                            break;
-                        case "user":
+                        }
+                        case "user" -> {
                             Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                                    .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_USER.toString()));
                             roles.add(userRole);
-
-                            break;
-                        default:
+                        }
+                        default -> {
                             Role basicRole = roleRepository.findByName(ERole.ROLE_BASIC)
-                                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                                    .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_BASIC.toString()));
                             roles.add(basicRole);
+                        }
                     }
                 });
             }

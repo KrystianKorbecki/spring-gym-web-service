@@ -1,4 +1,4 @@
-package com.api.gym.security;
+package com.api.gym.config;
 
 import com.api.gym.security.jwt.AuthEntryPointJwt;
 import com.api.gym.security.jwt.AuthTokenFilter;
@@ -60,7 +60,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/signin").permitAll()
 				.antMatchers("/signup").permitAll()
 				.antMatchers("/v2/**").permitAll()
-				.antMatchers("/**").permitAll()
+				.antMatchers("/swagger-ui/**").permitAll()
 				.anyRequest().authenticated();
 
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

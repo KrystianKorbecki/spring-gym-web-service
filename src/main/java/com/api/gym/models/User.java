@@ -3,7 +3,6 @@ package com.api.gym.models;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.hateoas.ResourceSupport;
 
 import java.util.Date;
 import java.util.HashSet;

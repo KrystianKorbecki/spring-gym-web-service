@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.hateoas.ResourceSupport;
 
 import javax.persistence.*;
 
@@ -14,7 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "role", schema = "public")
-public class Role extends ResourceSupport
+public class Role
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
