@@ -1,15 +1,16 @@
 package com.api.gym.payload.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShowAllTrainersResponse
+@Getter
+@Setter
+public class ShowUserResponse
 {
     String userName;
     String lastName;
     String email;
+    String phoneNumber;
 }
