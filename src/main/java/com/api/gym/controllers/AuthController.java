@@ -4,8 +4,11 @@ import javax.validation.Valid;
 
 import com.api.gym.payload.request.LoginRequest;
 import com.api.gym.payload.request.SignupRequest;
+import com.api.gym.repository.UserRepository;
+import com.api.gym.security.services.UserDetailsImpl;
 import com.api.gym.service.AuthService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,10 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController
 {
 	AuthService authService;
+	UserRepository userRepository;
 
-	public AuthController(AuthService authService)
+	public AuthController(AuthService authService, UserRepository userRepository)
 	{
 		this.authService = authService;
+		this.userRepository = userRepository;
 	}
 
 	@PostMapping("/signin")

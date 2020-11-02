@@ -18,16 +18,12 @@ public interface UserRepository extends JpaRepository<User, Long>
 	Optional<User> findByUserName(String username);
 	Optional<User> findAllByEmail(String username);
 	User findUserByEmail(String email);
-//	@Query("select count(*) from user where create_date = :date")
-//	Long findByCreateDate(Date date);
 
 	List<User> findAllByRolesIn(Set<Role> roles);
 
 	Boolean existsByUserName(String username);
 
-//	@Modifying
-//	@Query("")
-//	Boolean updateUserRoleByEmail(String email);
+	List<User> findAllByIdTrainer(Long id);
 
 	Boolean existsByEmail(String email);
 	Boolean existsByCode(String code);

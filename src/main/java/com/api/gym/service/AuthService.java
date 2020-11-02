@@ -59,14 +59,18 @@ public class AuthService
         String jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        User authUser= userRepository.findUserByEmail(userDetails.getEmail());
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(new JwtResponse(jwt,
                 userDetails.getId(),
+                authUser.getLastName(),
                 userDetails.getUsername(),
                 userDetails.getEmail(),
+                authUser.getPhoneNumber(),
+                authUser.getCreateDate(),
                 roles));
     }
 
