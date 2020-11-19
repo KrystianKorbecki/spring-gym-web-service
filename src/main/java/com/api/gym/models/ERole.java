@@ -6,5 +6,6 @@ public enum ERole
     ROLE_TRAINER,
     ROLE_ADMIN,
     ROLE_BASIC,
-    ROLE_SUPERADMIN
+    ROLE_SUPERADMIN,
+    ROLE_MODERATOR
 }

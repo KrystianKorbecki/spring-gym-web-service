@@ -17,18 +17,14 @@ import java.util.Set;
 @EnableJpaRepositories("com.api.gym.repository")
 public class GymApplication
 {
-    AuthService authService;
+    private static AuthService authService;
     GymApplication(AuthService authService)
     {
         this.authService = authService;
     }
 
-    public static void main(String[] args) {
-        SpringApplication.run(GymApplication.class, args);
-    }
-
     @PostConstruct
-    public void inituser()
+    public static void initUser()
     {
         Set<String> roles = new HashSet<>();
         roles.add("admin");
@@ -41,6 +37,13 @@ public class GymApplication
         signupRequest.setPhoneNumber("234567821");
         authService.registerUser(signupRequest);
     }
+
+    public static void main(String[] args)
+    {
+        SpringApplication.run(GymApplication.class, args);
+    }
+
+
 
 
 

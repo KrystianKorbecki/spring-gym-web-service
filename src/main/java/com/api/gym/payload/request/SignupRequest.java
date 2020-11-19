@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
+import java.sql.Date;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -36,4 +38,12 @@ public class SignupRequest
     @NotBlank
     @Size(min = 6, max = 40)
     private String password;
+
+    @NotBlank
+    private Date birthdayDate;
+
+    @NotBlank
+    private String gender;
+
+
 }
