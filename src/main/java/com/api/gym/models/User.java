@@ -86,14 +86,14 @@ public class User
 				joinColumns = @JoinColumn(name = "id_user"),
 				inverseJoinColumns = @JoinColumn(name = "id_role"))
 	private Set<Role> roles = new HashSet<>();
-//
-//	@ManyToMany(fetch = FetchType.LAZY)
-//	@JoinTable(	name = "user_ticket",
-//			joinColumns = @JoinColumn(name = "id_user"),
-//			inverseJoinColumns = @JoinColumn(name = "id_ticket"))
-//	private List<Ticket> ticket = new ArrayList<>();
-//
-//
-//	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-//	private List<Schedule> comments = new ArrayList<>();
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(	name = "user_ticket",
+			joinColumns = @JoinColumn(name = "id_user"),
+			inverseJoinColumns = @JoinColumn(name = "id_ticket"))
+	private List<Ticket> ticket = new ArrayList<>();
+
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Schedule> comments = new ArrayList<>();
 }

@@ -23,8 +23,9 @@ public class Schedule
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "id_user")
-    private Long idUser;
+    @ManyToOne
+    @JoinColumn(name="id_user", nullable=false)
+    private User user;
 
     @Column(name="start_date")
     @ElementCollection(targetClass=Timestamp.class)
