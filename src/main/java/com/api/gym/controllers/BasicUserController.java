@@ -2,7 +2,7 @@ package com.api.gym.controllers;
 
 import com.api.gym.models.User;
 import com.api.gym.repository.UserRepository;
-import com.api.gym.service.UsersService;
+import com.api.gym.service.users.UsersService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

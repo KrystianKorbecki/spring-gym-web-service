@@ -1,6 +1,7 @@
 package com.api.gym.repository;
 
 
+import com.api.gym.enums.ERole;
 import com.api.gym.models.Role;
 import com.api.gym.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long>
 {
 	Optional<User> findAllByEmail(String username);
 	User findUserByEmail(String email);
+	List<User> findUsersByRolesAndIdTrainer(Set<Role> roles, Long idTrainer);
 
 	List<User> findAllByRolesIn(Set<Role> roles);
 

@@ -1,15 +1,14 @@
 package com.api.gym.controllers.admin;
 
-import com.api.gym.models.ERole;
+import com.api.gym.enums.ERole;
 import com.api.gym.models.Schedule;
 import com.api.gym.models.User;
 import com.api.gym.payload.request.ChangeActive;
 import com.api.gym.payload.response.MessageResponse;
 import com.api.gym.payload.response.ShowUserResponse;
-import com.api.gym.repository.ScheduleRepository;
-import com.api.gym.service.ScheduleRepositoryService;
-import com.api.gym.service.UserRepositoryService;
-import com.api.gym.service.UsersService;
+import com.api.gym.service.repository.ScheduleRepositoryService;
+import com.api.gym.service.repository.UserRepositoryService;
+import com.api.gym.service.users.UsersService;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RestController

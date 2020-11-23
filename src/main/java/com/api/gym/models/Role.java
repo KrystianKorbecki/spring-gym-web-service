@@ -1,5 +1,6 @@
 package com.api.gym.models;
 
+import com.api.gym.enums.ERole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

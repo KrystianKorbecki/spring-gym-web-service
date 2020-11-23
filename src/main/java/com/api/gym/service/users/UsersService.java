@@ -1,17 +1,16 @@
-package com.api.gym.service;
+package com.api.gym.service.users;
 
 import com.api.gym.exceptions.RoleNotFoundException;
-import com.api.gym.models.ERole;
+import com.api.gym.enums.ERole;
 import com.api.gym.models.Role;
 import com.api.gym.models.User;
 import com.api.gym.payload.request.ChangeActive;
 import com.api.gym.payload.request.SignupRequest;
 import com.api.gym.payload.response.MessageResponse;
 import com.api.gym.payload.response.ShowUserResponse;
-import com.api.gym.repository.RoleRepository;
-import com.api.gym.repository.UserRepository;
 import com.api.gym.security.services.UserDetailsImpl;
-import org.springframework.http.HttpStatus;
+import com.api.gym.service.repository.RoleRepositoryService;
+import com.api.gym.service.repository.UserRepositoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

@@ -1,4 +1,4 @@
-package com.api.gym.service;
+package com.api.gym.service.repository;
 
 import com.api.gym.models.Schedule;
 import com.api.gym.models.User;
@@ -30,7 +30,7 @@ public class ScheduleRepositoryService
 
     public Schedule findScheduleByStartDateAndEndDateAndUser(List<Timestamp> startDate, List<Timestamp> endDate, User user)
     {
-        return scheduleRepository.findScheduleByStartDateAndEndDateAndUser(startDate, endDate, user);
+        return scheduleRepository.findScheduleByStartDateInAndEndDateInAndUser(startDate, endDate, user);
     }
 
 }

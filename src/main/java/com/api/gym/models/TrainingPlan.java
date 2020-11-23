@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,15 +23,23 @@ public class TrainingPlan
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "id_user")
-    private Long idUser;
+    @ManyToOne
+    @JoinColumn(name="id_user", nullable=false)
+    private User user;
 
-    @Column(name = "id_trainer")
-    private Long idTrainer;
-
-    @Column(name = "description")
-    private String description;
+    @ManyToOne
+    @JoinColumn(name="id_trainer", nullable=false)
+    private User trainer;
 
     @Column(name = "day_of_week")
-    private Integer dayOfWeek;
+    private String dayOfWeek;
+
+    @Column(name = "propose_rest_exercise")
+    private Time proposeRestBetweenExercises;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TrainingPlanExercise> trainingPlanExercises = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CompleteTrainingPlan> completeTrainingPlans = new ArrayList<>();
 }

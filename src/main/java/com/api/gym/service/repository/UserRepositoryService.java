@@ -1,11 +1,11 @@
-package com.api.gym.service;
+package com.api.gym.service.repository;
 
+import com.api.gym.enums.ERole;
 import com.api.gym.models.Role;
 import com.api.gym.models.User;
 import com.api.gym.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -37,6 +37,11 @@ public class UserRepositoryService
     public <S extends User> void saveUser(S entity)
     {
         userRepository.save(entity);
+    }
+
+    public List<User> findAllByRolesAndIdTrainer(Set<Role> roles, Long idTrainer)
+    {
+        return userRepository.findUsersByRolesAndIdTrainer(roles, idTrainer);
     }
 
 }

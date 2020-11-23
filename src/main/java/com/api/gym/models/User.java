@@ -96,4 +96,8 @@ public class User
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Schedule> comments = new ArrayList<>();
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<TrainingPlan> trainingPlans = new ArrayList<>();
+
 }

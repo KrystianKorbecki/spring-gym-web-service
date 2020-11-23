@@ -6,9 +6,9 @@ ALTER TABLE "user_ticket" ADD CONSTRAINT "user_ticket_fk2" FOREIGN KEY ("id_coup
 ALTER TABLE "schedule" ADD CONSTRAINT "user_schedule_fk0" FOREIGN KEY ("id_user") REFERENCES "user"("id");
 ALTER TABLE "training_plan" ADD CONSTRAINT "training_plan_fk0" FOREIGN KEY ("id_user") REFERENCES "user"("id");
 
+ALTER TABLE "training_plan_exercise" ADD CONSTRAINT "training_plan_exercise_fk0" FOREIGN KEY ("id_training_plan") REFERENCES "training_plan"("id");
+ALTER TABLE "training_plan_exercise" ADD CONSTRAINT "training_plan_exercise_fk1" FOREIGN KEY ("id_exercise") REFERENCES "exercise"("id");
 
-ALTER TABLE "propose_exercise_training_plan" ADD CONSTRAINT "propose_exercise_training_plan_fk0" FOREIGN KEY ("id_training_plan") REFERENCES "training_plan"("id");
-ALTER TABLE "propose_exercise_training_plan" ADD CONSTRAINT "propose_exercise_training_plan_fk1" FOREIGN KEY ("id_exercise") REFERENCES "exercise"("id");
+ALTER TABLE "complete_exercise" ADD CONSTRAINT "complete_exercise_fk0" FOREIGN KEY ("id_training_plan_exercise") REFERENCES "training_plan_exercise"("id");
 
-ALTER TABLE "exercise_training_plan" ADD CONSTRAINT "exercise_training_plan_fk0" FOREIGN KEY ("id_training_plan") REFERENCES "training_plan"("id");
-ALTER TABLE "exercise_training_plan" ADD CONSTRAINT "exercise_training_plan_fk1" FOREIGN KEY ("id_exercise") REFERENCES "exercise"("id");
+ALTER TABLE "complete_training_plan" ADD CONSTRAINT "complete_training_plan_fk0" FOREIGN KEY ("id_training_plan") REFERENCES "training_plan"("id");

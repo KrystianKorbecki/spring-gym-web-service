@@ -1,4 +1,4 @@
-package com.api.gym.models;
+package com.api.gym.enums;
 
 public enum ERole
 {

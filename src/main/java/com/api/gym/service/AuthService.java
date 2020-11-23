@@ -1,6 +1,6 @@
 package com.api.gym.service;
 
-import com.api.gym.models.ERole;
+import com.api.gym.enums.ERole;
 import com.api.gym.models.Role;
 import com.api.gym.models.User;
 import com.api.gym.payload.request.LoginRequest;
@@ -11,6 +11,7 @@ import com.api.gym.repository.RoleRepository;
 import com.api.gym.repository.UserRepository;
 import com.api.gym.security.jwt.JwtUtils;
 import com.api.gym.security.services.UserDetailsImpl;
+import com.api.gym.service.users.UsersService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

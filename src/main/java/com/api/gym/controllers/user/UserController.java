@@ -1,4 +1,4 @@
-package com.api.gym.controllers;
+package com.api.gym.controllers.user;
 
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,7 @@ public class UserController
     @ApiOperation(value = "Show main site for user")
     @GetMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Map<String,String>> trainerMainSite()
+    public ResponseEntity<Map<String,String>> userMainSite()
     {
         Map<String, String> response = new LinkedHashMap<>();
         response.put("newUsersToday", "1000");

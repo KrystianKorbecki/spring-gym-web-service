@@ -87,52 +87,77 @@ CREATE TABLE "coupon"
       OIDS=FALSE
     );
 
-CREATE TABLE "training_plan"
-(
-    "id" bigserial NOT NULL,
-    "id_user" bigint NOT NULL,
-    "id_trainer" bigint NOT NULL,
-    "description" text,
-    "day_of_week" int NOT NULL,
-    CONSTRAINT "training_plan_pk" PRIMARY KEY ("id")
+
+CREATE TABLE "exercise" (
+                            "id" serial NOT NULL,
+                            "name" varchar(20) NOT NULL,
+                            "description" TEXT NOT NULL,
+                            CONSTRAINT "exercise_pk" PRIMARY KEY ("id")
 ) WITH (
       OIDS=FALSE
     );
 
-CREATE TABLE "exercise"
+
+
+CREATE TABLE "training_plan" (
+                                 "id" serial NOT NULL,
+                                 "id_user" bigint NOT NULL,
+                                 "id_trainer" bigint NOT NULL,
+                                 "day_of_week" varchar(10) NOT NULL,
+                                 "propose_rest_exercise" TIME[] NOT NULL,
+                                 CONSTRAINT "training_plan_pk" PRIMARY KEY ("id")
+) WITH (
+      OIDS=FALSE
+    );
+
+
+
+CREATE TABLE "training_plan_exercise"
 (
     "id" serial NOT NULL,
-    "name" varchar(20) NOT NULL,
+    "id_training_plan" bigint NOT NULL,
+    "id_exercise" bigint NOT NULL,
     "description" TEXT NOT NULL,
-    CONSTRAINT "exercise_pk" PRIMARY KEY ("id")
+    "propose_series" smallint[] NOT NULL,
+    "propose_weight" DECIMAL[] NOT NULL,
+    "propose_repeat" smallint[] NOT NULL,
+    "propose_rest" TIME[] NOT NULL,
+    CONSTRAINT "training_plan_exercise_pk" PRIMARY KEY ("id")
 ) WITH (
       OIDS=FALSE
     );
 
-CREATE TABLE "propose_exercise_training_plan"
-(
-    "id" bigserial NOT NULL,
-    "id_training_plan" bigint NOT NULL,
-    "id_exercise" int NOT NULL,
-    "repeat" int[],
-    "weight" decimal[],
-    "comment" text,
-    "duration" time,
-    CONSTRAINT "propose_exercise_training_plan_pk" PRIMARY KEY ("id")
+
+
+CREATE TABLE "complete_exercise" (
+                                     "id" serial NOT NULL,
+                                     "id_training_plan_exercise" bigint NOT NULL,
+                                     "duration" TIME NOT NULL,
+                                     "weight" DECIMAL[] NOT NULL,
+                                     "series" smallint[] NOT NULL,
+                                     "note" TEXT NOT NULL,
+                                     "rest" TIME[] NOT NULL,
+                                     CONSTRAINT "complete_exercise_pk" PRIMARY KEY ("id")
 ) WITH (
       OIDS=FALSE
     );
 
-CREATE TABLE "exercise_training_plan"
+
+
+CREATE TABLE "complete_training_plan"
 (
-    "id" bigserial NOT NULL,
+    "id" serial NOT NULL,
     "id_training_plan" bigint NOT NULL,
-    "id_exercise" int NOT NULL,
-    "weight" DECIMAL[],
-    "repeat" int[],
-    "date_of_occurrence" DATE DEFAULT CURRENT_DATE,
-    "duration" TIME,
-    CONSTRAINT "exercise_training_plan_pk" PRIMARY KEY ("id")
+    "start_date" TIMESTAMP NOT NULL,
+    "end_date" TIMESTAMP NOT NULL,
+    "rest_exercise" TIME[] NOT NULL,
+    CONSTRAINT "complete_training_plan_pk" PRIMARY KEY ("id")
 ) WITH (
       OIDS=FALSE
     );
+
+
+
+
+
+

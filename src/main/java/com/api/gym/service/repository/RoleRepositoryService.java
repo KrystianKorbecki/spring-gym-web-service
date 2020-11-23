@@ -1,6 +1,6 @@
-package com.api.gym.service;
+package com.api.gym.service.repository;
 
-import com.api.gym.models.ERole;
+import com.api.gym.enums.ERole;
 import com.api.gym.models.Role;
 import com.api.gym.repository.RoleRepository;
 import org.springframework.stereotype.Service;

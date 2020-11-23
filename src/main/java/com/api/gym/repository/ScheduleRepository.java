@@ -15,5 +15,5 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long>
 
     List<Schedule> findAllByUser(User user);
 
-    Schedule findScheduleByStartDateAndEndDateAndUser(List<Timestamp> startDate, List<Timestamp> endDate, User user);
+    Schedule findScheduleByStartDateInAndEndDateInAndUser(List<Timestamp> startDate, List<Timestamp> endDate, User user);
 }

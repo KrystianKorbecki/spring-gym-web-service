@@ -1,13 +1,11 @@
 package com.api.gym.controllers.trainer;
 
-import com.api.gym.models.ERole;
+import com.api.gym.enums.ERole;
 import com.api.gym.models.User;
-import com.api.gym.payload.request.ChangeActive;
 import com.api.gym.payload.request.EmailRequest;
 import com.api.gym.payload.response.ShowUserResponse;
-import com.api.gym.service.UserRepositoryService;
-import com.api.gym.service.UsersService;
-import io.swagger.annotations.ApiOperation;
+import com.api.gym.service.repository.UserRepositoryService;
+import com.api.gym.service.users.UsersService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

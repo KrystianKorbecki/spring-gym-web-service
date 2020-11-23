@@ -26,4 +26,7 @@ public class Exercise
 
     @Column(name = "description")
     private String description;
+
+    @OneToOne(mappedBy = "exercise")
+    private TrainingPlanExercise trainingPlanExercise;
 }

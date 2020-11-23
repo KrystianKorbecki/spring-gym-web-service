@@ -1,14 +1,13 @@
 package com.api.gym.controllers.trainer;
 
-import com.api.gym.models.ERole;
-import com.api.gym.models.User;
-import com.api.gym.payload.request.EmailRequest;
+import com.api.gym.models.Exercise;
+import com.api.gym.payload.request.ExerciseRequest;
 import com.api.gym.payload.request.SignupRequest;
 import com.api.gym.payload.response.MessageResponse;
-import com.api.gym.payload.response.ShowUserResponse;
-import com.api.gym.service.ScheduleRepositoryService;
-import com.api.gym.service.UserRepositoryService;
-import com.api.gym.service.UsersService;
+import com.api.gym.repository.ExerciseRepository;
+import com.api.gym.service.repository.ScheduleRepositoryService;
+import com.api.gym.service.repository.UserRepositoryService;
+import com.api.gym.service.users.UsersService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +26,13 @@ public class TrainerController
     private final UserRepositoryService userRepositoryService;
     private final ScheduleRepositoryService scheduleRepositoryService;
     private final UsersService usersService;
-    TrainerController(UserRepositoryService userRepositoryService, ScheduleRepositoryService scheduleRepositoryService, UsersService usersService)
+    private final ExerciseRepository exerciseRepository;
+    TrainerController(UserRepositoryService userRepositoryService, ScheduleRepositoryService scheduleRepositoryService, UsersService usersService, ExerciseRepository exerciseRepository)
     {
         this.userRepositoryService = userRepositoryService;
         this.scheduleRepositoryService = scheduleRepositoryService;
         this.usersService = usersService;
+        this.exerciseRepository = exerciseRepository;
     }
 
     @ApiOperation(value = "Show main site for trainer")
@@ -65,5 +66,23 @@ public class TrainerController
     {
         usersService.changeUserProfile(signupRequest);
         return ResponseEntity.ok(new MessageResponse("Changed"));
+    }
+
+    @GetMapping("/exercise")
+    @PreAuthorize("hasRole('TRAINER')")
+    public ResponseEntity<?> showExercises()
+    {
+        return ResponseEntity.ok(exerciseRepository.findAll());
+    }
+
+    @PostMapping("/exercise")
+    @PreAuthorize("hasRole('TRAINER')")
+    public ResponseEntity<?> createExercise(@Valid @RequestBody ExerciseRequest exerciseRequest)
+    {
+        Exercise exercise = new Exercise();
+        exercise.setName(exerciseRequest.getName());
+        exercise.setDescription(exerciseRequest.getDescription());
+        exerciseRepository.save(exercise);
+        return ResponseEntity.ok(new MessageResponse("Create Successfully!"));
     }
 }
