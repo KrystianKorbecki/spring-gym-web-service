@@ -93,11 +93,13 @@ public class User
 			inverseJoinColumns = @JoinColumn(name = "id_ticket"))
 	private List<Ticket> ticket = new ArrayList<>();
 
-
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Schedule> comments = new ArrayList<>();
-
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "id")
 	private List<TrainingPlan> trainingPlans = new ArrayList<>();
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "id")
+	private List<Schedule> schedules = new ArrayList<>();
+
 
 }

@@ -32,7 +32,7 @@ public class CompleteExercise
     @ElementCollection(targetClass= Double.class)
     private List<Double> weight;
 
-    @Column(name = "series")
+    @Column(name = "repeat")
     @ElementCollection(targetClass= Short.class)
     private List<Short> series;
 

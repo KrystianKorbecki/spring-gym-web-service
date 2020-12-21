@@ -68,8 +68,8 @@ CREATE TABLE "schedule"
 (
     "id" serial NOT NULL,
     "id_user" bigint NOT NULL,
-    "start_date" TIMESTAMP[7] NOT NULL,
-    "end_date" TIMESTAMP[7] NOT NULL,
+    "start_date" TIMESTAMP NOT NULL,
+    "end_date" TIMESTAMP NOT NULL,
     CONSTRAINT "schedule_pk" PRIMARY KEY ("id")
 ) WITH (
       OIDS=FALSE
@@ -104,7 +104,7 @@ CREATE TABLE "training_plan" (
                                  "id_user" bigint NOT NULL,
                                  "id_trainer" bigint NOT NULL,
                                  "day_of_week" varchar(10) NOT NULL,
-                                 "propose_rest_exercise" TIME[] NOT NULL,
+                                 "propose_rest_exercise" INTEGER[] NOT NULL,
                                  CONSTRAINT "training_plan_pk" PRIMARY KEY ("id")
 ) WITH (
       OIDS=FALSE
@@ -118,10 +118,9 @@ CREATE TABLE "training_plan_exercise"
     "id_training_plan" bigint NOT NULL,
     "id_exercise" bigint NOT NULL,
     "description" TEXT NOT NULL,
-    "propose_series" smallint[] NOT NULL,
     "propose_weight" DECIMAL[] NOT NULL,
-    "propose_repeat" smallint[] NOT NULL,
-    "propose_rest" TIME[] NOT NULL,
+    "propose_repeat" INTEGER[] NOT NULL,
+    "propose_rest" INTEGER[] NOT NULL,
     CONSTRAINT "training_plan_exercise_pk" PRIMARY KEY ("id")
 ) WITH (
       OIDS=FALSE
@@ -129,14 +128,15 @@ CREATE TABLE "training_plan_exercise"
 
 
 
-CREATE TABLE "complete_exercise" (
+CREATE TABLE "complete_exercise"
+(
                                      "id" serial NOT NULL,
                                      "id_training_plan_exercise" bigint NOT NULL,
                                      "duration" TIME NOT NULL,
                                      "weight" DECIMAL[] NOT NULL,
-                                     "series" smallint[] NOT NULL,
+                                     "repeat" INTEGER[] NOT NULL,
+                                     "rest" INTEGER[] NOT NULL,
                                      "note" TEXT NOT NULL,
-                                     "rest" TIME[] NOT NULL,
                                      CONSTRAINT "complete_exercise_pk" PRIMARY KEY ("id")
 ) WITH (
       OIDS=FALSE
@@ -150,7 +150,7 @@ CREATE TABLE "complete_training_plan"
     "id_training_plan" bigint NOT NULL,
     "start_date" TIMESTAMP NOT NULL,
     "end_date" TIMESTAMP NOT NULL,
-    "rest_exercise" TIME[] NOT NULL,
+    "rest_exercise" INTEGER[] NOT NULL,
     CONSTRAINT "complete_training_plan_pk" PRIMARY KEY ("id")
 ) WITH (
       OIDS=FALSE

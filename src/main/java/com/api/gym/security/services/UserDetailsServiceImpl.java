@@ -2,6 +2,7 @@ package com.api.gym.security.services;
 
 import com.api.gym.models.User;
 import com.api.gym.repository.UserRepository;
+import com.api.gym.service.repository.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,14 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserDetailsServiceImpl implements UserDetailsService
 {
 	@Autowired
-	UserRepository userRepository;
+	UserService userService;
 
 	@Override
 	@Transactional
-	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException
+	public UserDetails loadUserByUsername(String email)
 	{
-		User user = userRepository.findAllByEmail(email)
-				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with email: " + email));
+		User user = userService.findUserByEmail(email);
 
 		return UserDetailsImpl.build(user);
 	}

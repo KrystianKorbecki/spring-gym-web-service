@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Time;
+import javax.validation.constraints.Email;
 import java.util.List;
 
 @Data
@@ -12,9 +12,11 @@ import java.util.List;
 @AllArgsConstructor
 public class TrainingPlanCreateRequest
 {
+   @Email
    private String userEmail;
+
    private String dayOfWeek;
-   private Time proposeRestBetweenExercises;
+   private List<Integer> proposeRestBetweenExercises;
    private List<TrainingPlanExerciseRequest> trainingPlanExerciseRequests;
 
 }

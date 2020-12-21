@@ -4,7 +4,9 @@ import com.api.gym.enums.ERole;
 import com.api.gym.models.User;
 import com.api.gym.payload.request.EmailRequest;
 import com.api.gym.payload.response.ShowUserResponse;
-import com.api.gym.service.repository.UserRepositoryService;
+import com.api.gym.converters.Converter;
+import com.api.gym.service.repository.RoleService;
+import com.api.gym.service.repository.UserService;
 import com.api.gym.service.users.UsersService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +23,16 @@ import java.util.List;
 public class TrainerBasicController
 {
     private final UsersService usersService;
-    private final UserRepositoryService userRepositoryService;
+    private final UserService userService;
+    private final RoleService roleService;
+    private final Converter converter;
 
-    TrainerBasicController(UsersService usersService, UserRepositoryService userRepositoryService)
+    TrainerBasicController(UsersService usersService, UserService userService, RoleService roleService, Converter converter)
     {
         this.usersService = usersService;
-        this.userRepositoryService = userRepositoryService;
+        this.userService = userService;
+        this.roleService = roleService;
+        this.converter = converter;
     }
 
     @GetMapping("/basic")
@@ -35,12 +41,12 @@ public class TrainerBasicController
     {
         if(email == null)
         {
-            List<ShowUserResponse> showBasicUsers = new ArrayList<>(usersService.findUsersByRole(ERole.ROLE_BASIC));
+            List<ShowUserResponse> showBasicUsers = new ArrayList<>(converter.convertUserListToShowUserResponseCollection(userService.findUsersByRole(roleService.findRoleByName(ERole.ROLE_BASIC))));
             return ResponseEntity.ok(showBasicUsers);
         }
         else
         {
-            User user = userRepositoryService.findUserByEmail(email);
+            User user = userService.findUserByEmail(email);
             return ResponseEntity.ok(user);
         }
     }
@@ -57,6 +63,6 @@ public class TrainerBasicController
     @PreAuthorize("hasRole('TRAINER')")
     public ResponseEntity<?>deleteBasic(@Valid @RequestBody EmailRequest emailRequest)
     {
-        return ResponseEntity.ok(userRepositoryService.deleteByEmail(emailRequest.getEmail()));
+        return ResponseEntity.ok(userService.deleteByEmail(emailRequest.getEmail()));
     }
 }

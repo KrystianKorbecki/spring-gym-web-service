@@ -7,16 +7,15 @@ import com.api.gym.payload.request.SignupRequest;
 import com.api.gym.repository.UserRepository;
 import com.api.gym.security.services.UserDetailsImpl;
 import com.api.gym.service.AuthService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
+@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
 public class AuthController
 {
 	AuthService authService;

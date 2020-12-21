@@ -1,9 +1,12 @@
 package com.api.gym.models;
 
+import com.vladmihalcea.hibernate.type.array.ListArrayType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.sql.Time;
@@ -16,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "complete_training_plan", schema = "public")
+@TypeDef(name = "list-array", typeClass = ListArrayType.class)
 public class CompleteTrainingPlan
 {
     @Id
@@ -33,7 +37,7 @@ public class CompleteTrainingPlan
     @Column(name = "end_date")
     private Timestamp endDate;
 
-    @Column(name = "rest_exercise")
-    @ElementCollection(targetClass= Time.class)
-    private List<Time> restBetweenExercise;
+    @Type(type = "list-array")
+    @Column(name = "rest_exercise", columnDefinition = "integer[]")
+    private List<Integer> restBetweenExercise;
 }

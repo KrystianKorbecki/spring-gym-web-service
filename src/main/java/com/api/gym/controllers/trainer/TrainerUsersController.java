@@ -5,20 +5,16 @@ import com.api.gym.models.*;
 import com.api.gym.payload.request.ChangeActive;
 import com.api.gym.payload.request.EmailRequest;
 import com.api.gym.payload.request.TrainingPlanCreateRequest;
-import com.api.gym.payload.request.TrainingPlanExerciseRequest;
-import com.api.gym.payload.response.MessageResponse;
-import com.api.gym.payload.response.ShowUserResponse;
-import com.api.gym.repository.ExerciseRepository;
-import com.api.gym.repository.TrainingPlanExerciseRepository;
-import com.api.gym.repository.TrainingPlanRepository;
-import com.api.gym.service.repository.RoleRepositoryService;
-import com.api.gym.service.repository.UserRepositoryService;
+import com.api.gym.converters.Converter;
+import com.api.gym.service.repository.*;
+import com.api.gym.service.users.TrainersService;
 import com.api.gym.service.users.UsersService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,20 +26,25 @@ import java.util.Set;
 public class TrainerUsersController
 {
     private final UsersService usersService;
-    private final UserRepositoryService userRepositoryService;
-    private final RoleRepositoryService roleRepositoryService;
-    private final TrainingPlanRepository trainingPlanRepository;
-    private final ExerciseRepository exerciseRepository;
-    private final TrainingPlanExerciseRepository trainingPlanExerciseRepository;
+    private final UserService userService;
+    private final ExerciseService exerciseService;
+    private final TrainingPlanService trainingPlanService;
+    private final TrainingPlanExerciseService trainingPlanExerciseService;
+    private final RoleService roleService;
+    private final Converter converter;
+    private final TrainersService trainersService;
 
-    TrainerUsersController(UsersService usersService, UserRepositoryService userRepositoryService, TrainingPlanRepository trainingPlanRepository, ExerciseRepository exerciseRepository, TrainingPlanExerciseRepository trainingPlanExerciseRepository,RoleRepositoryService roleRepositoryService)
+    TrainerUsersController(UsersService usersService, UserService userService, ExerciseService exerciseService,TrainingPlanExerciseService trainingPlanExerciseService,
+                           TrainingPlanService trainingPlanService, RoleService roleService, Converter converter, TrainersService trainersService)
     {
         this.usersService = usersService;
-        this.userRepositoryService = userRepositoryService;
-        this.trainingPlanRepository = trainingPlanRepository;
-        this.exerciseRepository = exerciseRepository;
-        this.trainingPlanExerciseRepository = trainingPlanExerciseRepository;
-        this.roleRepositoryService = roleRepositoryService;
+        this.trainingPlanExerciseService = trainingPlanExerciseService;
+        this.userService = userService;
+        this.exerciseService = exerciseService;
+        this.trainingPlanService = trainingPlanService;
+        this.roleService = roleService;
+        this.converter = converter;
+        this.trainersService = trainersService;
     }
 
     @GetMapping("/user")
@@ -52,14 +53,13 @@ public class TrainerUsersController
     {
         if(email == null)
         {
-            //List<ShowUserResponse> showUsers = new ArrayList<>(usersService.findUsersByRole(ERole.ROLE_USER));
-            Set<Role> roles = usersService.findRole(ERole.ROLE_USER);
-            List<User> userList = new ArrayList<>(userRepositoryService.findAllByRolesAndIdTrainer(roles, usersService.userDetails().getId()));
+            Set<Role> roles = converter.convertRoleToRolesSet(roleService.findRoleByName(ERole.ROLE_USER));
+            List<User> userList = new ArrayList<>(userService.findAllByRolesAndIdTrainer(roles, usersService.userDetails().getId()));
             return ResponseEntity.ok(userList);
         }
         else
         {
-            User user = userRepositoryService.findUserByEmail(email);
+            User user = userService.findUserByEmail(email);
             return ResponseEntity.ok(user);
         }
     }
@@ -68,7 +68,7 @@ public class TrainerUsersController
     @PreAuthorize("hasRole('TRAINER')")
     public ResponseEntity<?>deleteUser(@Valid @RequestBody EmailRequest emailRequest)
     {
-        return ResponseEntity.ok(userRepositoryService.deleteByEmail(emailRequest.getEmail()));
+        return ResponseEntity.ok(userService.deleteByEmail(emailRequest.getEmail()));
     }
 
     @ApiOperation(value = "Change active for user")
@@ -85,43 +85,21 @@ public class TrainerUsersController
     {
         if(email != null && dayOfWeek != null)
         {
-            return ResponseEntity.ok(trainingPlanRepository.findByUserAndDayOfWeek(userRepositoryService.findUserByEmail(email), dayOfWeek));
+            return ResponseEntity.ok(trainingPlanService.findByUserAndDayOfWeek(userService.findUserByEmail(email), dayOfWeek));
         }
         else
         {
-            return ResponseEntity.ok(trainingPlanRepository.findAllByUser(userRepositoryService.findUserByEmail(email)));
+            return ResponseEntity.ok(trainingPlanService.findAllByUser(userService.findUserByEmail(email)));
         }
 
     }
 
     @PostMapping("/user/training")
     @PreAuthorize("hasRole('TRAINER')")
+    @Transactional
     public ResponseEntity<?> createNewTrainingPlan(@Valid @RequestBody TrainingPlanCreateRequest trainingPlanCreateRequest)
     {
-        User user = userRepositoryService.findUserByEmail(trainingPlanCreateRequest.getUserEmail());
-        User trainer = userRepositoryService.findUserByEmail(usersService.userDetails().getEmail());
-        TrainingPlan trainingPlan = new TrainingPlan();
-        trainingPlan.setTrainer(trainer);
-        trainingPlan.setUser(user);
-        trainingPlan.setDayOfWeek(trainingPlanCreateRequest.getDayOfWeek());
-        trainingPlan.setProposeRestBetweenExercises(trainingPlanCreateRequest.getProposeRestBetweenExercises());
-        trainingPlanRepository.save(trainingPlan);
-
-
-        List<TrainingPlanExerciseRequest> trainingPlanExerciseRequests = new ArrayList<>(trainingPlanCreateRequest.getTrainingPlanExerciseRequests());
-        for(TrainingPlanExerciseRequest training:trainingPlanExerciseRequests)
-        {
-            TrainingPlanExercise trainingPlanExercise = new TrainingPlanExercise();
-            trainingPlanExercise.setDescription(training.getDescription());
-            trainingPlanExercise.setExercise(exerciseRepository.findByName(training.getNameExercise()));
-            trainingPlanExercise.setProposeRepeat(training.getProposeRepeat());
-            trainingPlanExercise.setProposeRest(training.getProposeRest());
-            trainingPlanExercise.setProposeSeries(training.getProposeSeries());
-            trainingPlanExercise.setProposeWeight(training.getProposeWeight());
-            trainingPlanExercise.setTrainingPlan(trainingPlanRepository.findByUserAndTrainerAndDayOfWeek(user,trainer,trainingPlanCreateRequest.getDayOfWeek()));
-            trainingPlanExerciseRepository.save(trainingPlanExercise);
-        }
-        return ResponseEntity.ok(new MessageResponse("Successfully save"));
+        return ResponseEntity.ok(trainersService.createNewTrainingPlan(trainingPlanCreateRequest));
     }
 
 

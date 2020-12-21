@@ -11,6 +11,8 @@ import com.api.gym.repository.RoleRepository;
 import com.api.gym.repository.UserRepository;
 import com.api.gym.security.jwt.JwtUtils;
 import com.api.gym.security.services.UserDetailsImpl;
+import com.api.gym.service.repository.RoleService;
+import com.api.gym.service.repository.UserService;
 import com.api.gym.service.users.UsersService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,24 +31,22 @@ import java.util.stream.Collectors;
 @Service
 public class AuthService
 {
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final GenerateUserCode generateUserCode;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
-    private final UsersService usersService;
+    private final UserService userService;
+    private final RoleService roleService;
 
-    AuthService(UserRepository userRepository, RoleRepository roleRepository, GenerateUserCode generateUserCode,
-                AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder, UsersService usersService)
+    AuthService(GenerateUserCode generateUserCode, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder,
+                UserService userService, RoleService roleService)
     {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
         this.generateUserCode = generateUserCode;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.passwordEncoder = passwordEncoder;
-        this.usersService = usersService;
+        this.userService = userService;
+        this.roleService = roleService;
     }
 
     public ResponseEntity<?> authenticateUser(LoginRequest loginRequest)
@@ -58,7 +58,7 @@ public class AuthService
         String jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        User authUser= userRepository.findUserByEmail(userDetails.getEmail());
+        User authUser= userService.findUserByEmail(userDetails.getEmail());
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
@@ -81,13 +81,13 @@ public class AuthService
         }
         else
         {
-            userRepository.save(convertSignUpRequestToUser(signUpRequest));
+            userService.saveUser(convertSignUpRequestToUser(signUpRequest));
             return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
         }
     }
     public boolean checkIfUserExists(String email)
     {
-        return userRepository.existsByEmail(email);
+        return userService.existsByEmail(email);
     }
 
     public User convertSignUpRequestToUser(SignupRequest signUpRequest)
@@ -111,23 +111,23 @@ public class AuthService
         Set<Role> roles = new HashSet<>();
         if (strRoles == null)
         {
-            roles.addAll(usersService.findRole(ERole.ROLE_BASIC));
+            roles.add(roleService.findRoleByName(ERole.ROLE_BASIC));
         }
         else
         {
             strRoles.forEach(role -> {
                 switch (role) {
                     case "admin" -> {
-                        roles.addAll(usersService.findRole(ERole.ROLE_ADMIN));
+                        roles.add(roleService.findRoleByName(ERole.ROLE_ADMIN));
                     }
                     case "trainer" -> {
-                        roles.addAll(usersService.findRole(ERole.ROLE_TRAINER));
+                        roles.add(roleService.findRoleByName(ERole.ROLE_TRAINER));
                     }
                     case "user" -> {
-                        roles.addAll(usersService.findRole(ERole.ROLE_USER));
+                        roles.add(roleService.findRoleByName(ERole.ROLE_USER));
                     }
                     default -> {
-                        roles.addAll(usersService.findRole(ERole.ROLE_BASIC));
+                        roles.add(roleService.findRoleByName(ERole.ROLE_BASIC));
                     }
                 }
             });

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Time;
 import java.util.List;
 
 @Data
@@ -13,9 +12,8 @@ import java.util.List;
 public class TrainingPlanExerciseRequest
 {
     private List<Double> proposeWeight;
-    private List<Short> proposeSeries;
-    private List<Short> proposeRepeat;
-    private List<Time> proposeRest;
+    private List<Integer> proposeRepeat;
+    private List<Integer> proposeRest;
     private String description;
     private String nameExercise;
 }

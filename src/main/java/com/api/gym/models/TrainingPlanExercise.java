@@ -1,9 +1,12 @@
 package com.api.gym.models;
 
+import com.vladmihalcea.hibernate.type.array.ListArrayType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.sql.Time;
@@ -17,6 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@TypeDef(name = "list-array", typeClass = ListArrayType.class)
 @Table(name = "training_plan_exercise", schema = "public")
 public class TrainingPlanExercise
 {
@@ -32,21 +36,17 @@ public class TrainingPlanExercise
     @JoinColumn(name = "id_exercise", referencedColumnName = "id")
     private Exercise exercise;
 
-    @Column(name = "propose_weight")
-    @ElementCollection(targetClass= Double.class)
+    @Type(type = "list-array")
+    @Column(name = "propose_weight", columnDefinition = "numeric[]")
     private List<Double> proposeWeight;
 
-    @Column(name = "propose_series")
-    @ElementCollection(targetClass= Short.class)
-    private List<Short> proposeSeries;
+    @Type(type = "list-array")
+    @Column(name = "propose_repeat",  columnDefinition = "integer[]")
+    private List<Integer> proposeRepeat;
 
-    @Column(name = "propose_repeat")
-    @ElementCollection(targetClass= Short.class)
-    private List<Short> proposeRepeat;
-
-    @Column(name = "propose_rest")
-    @ElementCollection(targetClass= Time.class)
-    private List<Time> proposeRest;
+    @Type(type = "list-array")
+    @Column(name = "propose_rest",  columnDefinition = "integer[]")
+    private List<Integer> proposeRest;
 
     @Column(name = "description")
     private String description;

@@ -1,5 +1,7 @@
 package com.api.gym.controllers.user;
 
+import com.api.gym.service.repository.TrainingPlanService;
+import com.api.gym.service.users.UsersService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +19,29 @@ import java.util.Map;
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class UserController
 {
-    @ApiOperation(value = "Show main site for user")
+    private final UsersService usersService;
+    private final TrainingPlanService trainingPlanService;
+
+    UserController(UsersService usersService, TrainingPlanService trainingPlanService)
+    {
+        this.usersService = usersService;
+        this.trainingPlanService = trainingPlanService;
+    }
+
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Map<String,String>> userMainSite()
+    {
+        Map<String, String> response = new LinkedHashMap<>();
+        response.put("newUsersToday", "1000");
+        response.put("soldTicketsToday", "100");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/training")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> showTrainingPlan()
     {
         Map<String, String> response = new LinkedHashMap<>();
         response.put("newUsersToday", "1000");

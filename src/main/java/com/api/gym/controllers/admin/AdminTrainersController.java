@@ -4,22 +4,22 @@ import com.api.gym.enums.ERole;
 import com.api.gym.models.Schedule;
 import com.api.gym.models.User;
 import com.api.gym.payload.request.ChangeActive;
+import com.api.gym.payload.request.ScheduleRequest;
+import com.api.gym.payload.request.ScheduleUpdateRequest;
 import com.api.gym.payload.response.MessageResponse;
 import com.api.gym.payload.response.ShowUserResponse;
-import com.api.gym.service.repository.ScheduleRepositoryService;
-import com.api.gym.service.repository.UserRepositoryService;
+import com.api.gym.converters.Converter;
+import com.api.gym.service.repository.RoleService;
+import com.api.gym.service.repository.ScheduleService;
+import com.api.gym.service.repository.UserService;
 import com.api.gym.service.users.UsersService;
 import io.swagger.annotations.ApiOperation;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,53 +28,36 @@ import java.util.List;
 @RequestMapping("/admin")
 public class AdminTrainersController
 {
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    private static class ScheduleRequest
-    {
-        private List<Timestamp> start_date;
-        private List<Timestamp> end_date;
-        private String emailTrainer;
-    }
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    private static class ScheduleUpdateRequest
-    {
-        private List<Timestamp> old_start_date;
-        private List<Timestamp> old_end_date;
-        private List<Timestamp> new_start_date;
-        private List<Timestamp> new_end_date;
-        private String emailTrainer;
-    }
+    private final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
     private final UsersService usersService;
-    private final UserRepositoryService userRepositoryService;
-    private final ScheduleRepositoryService scheduleRepositoryService;
+    private final UserService userService;
+    private final ScheduleService scheduleService;
+    private final Converter converter;
+    private final RoleService roleService;
 
-
-    AdminTrainersController(UsersService usersService, UserRepositoryService userRepositoryService, ScheduleRepositoryService scheduleRepositoryService)
+    AdminTrainersController(UsersService usersService, UserService userService, ScheduleService scheduleService, Converter converter, RoleService roleService)
     {
         this.usersService = usersService;
-        this.userRepositoryService = userRepositoryService;
-        this.scheduleRepositoryService = scheduleRepositoryService;
+        this.userService = userService;
+        this.scheduleService = scheduleService;
+        this.converter = converter;
+        this.roleService = roleService;
     }
 
     @GetMapping("/trainer")
     @PreAuthorize("hasRole('ADMIN')")
+    @ResponseBody
     public ResponseEntity<?> showTrainers(@RequestParam(value = "email", required = false) String email)
     {
         if(email == null)
         {
-            List<ShowUserResponse> showTrainers = new ArrayList<>(usersService.findUsersByRole(ERole.ROLE_TRAINER));
+            List<ShowUserResponse> showTrainers = new ArrayList<>(converter.convertUserListToShowUserResponseCollection(userService.findUsersByRole(roleService.findRoleByName(ERole.ROLE_TRAINER))));
             return ResponseEntity.ok(showTrainers);
         }
         else
         {
-            User user = userRepositoryService.findUserByEmail(email);
+            User user = userService.findUserByEmail(email);
             return ResponseEntity.ok(user);
         }
     }
@@ -87,37 +70,50 @@ public class AdminTrainersController
         return usersService.changeActive(changeActive);
     }
 
-    @ApiOperation(value = "Create schedule for user")
+    @ApiOperation(value = "Create schedule for user, you must use date format: " + DATE_FORMAT)
     @PostMapping("/trainer/schedule")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> setSchedule(@Valid @RequestBody ScheduleRequest scheduleRequest)
     {
-        Schedule schedule = new Schedule();
-        schedule.setStartDate(scheduleRequest.getStart_date());
-        schedule.setEndDate(scheduleRequest.getEnd_date());
-        schedule.setUser(userRepositoryService.findUserByEmail(scheduleRequest.getEmailTrainer()));
-        scheduleRepositoryService.saveSchedule(schedule);
-        return ResponseEntity.ok(new MessageResponse("Success"));
+        if(scheduleRequest.getStartDate().size() == scheduleRequest.getEndDate().size())
+        {
+            scheduleService.saveScheduleList(scheduleRequest.getStartDate(), scheduleRequest.getEndDate(), userService.findUserByEmail(scheduleRequest.getEmailTrainer()));
+            return ResponseEntity.ok(new MessageResponse("Success"));
+        }
+        else
+        {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/trainer/schedule")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> showSchedule(@RequestParam(value = "email", required = true) String email)
     {
-        List<Schedule> scheduleList = scheduleRepositoryService.findScheduleByUser(userRepositoryService.findUserByEmail(email));
+        List<Schedule> scheduleList = scheduleService.findScheduleByUser(userService.findUserByEmail(email));
         return ResponseEntity.ok(scheduleList);
     }
 
     @PatchMapping("/trainer/schedule")
     @PreAuthorize("hasRole('ADMIN')")
+    @ApiOperation(value = "Update schedule for user, you must use date format: " + DATE_FORMAT)
     public ResponseEntity<?> updateSchedule(@Valid @RequestBody ScheduleUpdateRequest scheduleUpdateRequest)
     {
-        Schedule schedule = scheduleRepositoryService
-                .findScheduleByStartDateAndEndDateAndUser(scheduleUpdateRequest.getOld_start_date(), scheduleUpdateRequest.getOld_end_date(),
-                        userRepositoryService.findUserByEmail(scheduleUpdateRequest.getEmailTrainer()));
-        schedule.setStartDate(scheduleUpdateRequest.getNew_start_date());
-        schedule.setEndDate(scheduleUpdateRequest.getNew_end_date());
-        scheduleRepositoryService.saveSchedule(schedule);
-        return ResponseEntity.ok(schedule);
+        if(scheduleUpdateRequest.getOldStartDate().size() == scheduleUpdateRequest.getOldEndDate().size() && scheduleUpdateRequest.getNewEndDate().size() == scheduleUpdateRequest.getNewStartDate().size())
+        {
+            User user = userService.findUserByEmail(scheduleUpdateRequest.getEmailTrainer());
+            for (int i = 0; i < scheduleUpdateRequest.getOldEndDate().size(); i++)
+            {
+                Schedule schedule = scheduleService.findScheduleByStartDateAndEndDateAndUser(scheduleUpdateRequest.getOldStartDate().get(i), scheduleUpdateRequest.getOldEndDate().get(i), user);
+                schedule.setStartDate(scheduleUpdateRequest.getNewStartDate().get(i));
+                schedule.setEndDate(scheduleUpdateRequest.getNewEndDate().get(i));
+                scheduleService.saveSchedule(schedule);
+            }
+            return ResponseEntity.ok("Success");
+        }
+        else
+        {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 }

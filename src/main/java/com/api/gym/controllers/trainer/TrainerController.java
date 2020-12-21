@@ -5,8 +5,9 @@ import com.api.gym.payload.request.ExerciseRequest;
 import com.api.gym.payload.request.SignupRequest;
 import com.api.gym.payload.response.MessageResponse;
 import com.api.gym.repository.ExerciseRepository;
-import com.api.gym.service.repository.ScheduleRepositoryService;
-import com.api.gym.service.repository.UserRepositoryService;
+import com.api.gym.service.repository.ExerciseService;
+import com.api.gym.service.repository.ScheduleService;
+import com.api.gym.service.repository.UserService;
 import com.api.gym.service.users.UsersService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -23,16 +24,16 @@ import java.util.*;
 public class TrainerController
 {
 
-    private final UserRepositoryService userRepositoryService;
-    private final ScheduleRepositoryService scheduleRepositoryService;
+    private final UserService userService;
+    private final ScheduleService scheduleService;
     private final UsersService usersService;
-    private final ExerciseRepository exerciseRepository;
-    TrainerController(UserRepositoryService userRepositoryService, ScheduleRepositoryService scheduleRepositoryService, UsersService usersService, ExerciseRepository exerciseRepository)
+    private final ExerciseService exerciseService;
+    TrainerController(UserService userService, ScheduleService scheduleService, UsersService usersService, ExerciseService exerciseService)
     {
-        this.userRepositoryService = userRepositoryService;
-        this.scheduleRepositoryService = scheduleRepositoryService;
+        this.userService = userService;
+        this.scheduleService = scheduleService;
         this.usersService = usersService;
-        this.exerciseRepository = exerciseRepository;
+        this.exerciseService = exerciseService;
     }
 
     @ApiOperation(value = "Show main site for trainer")
@@ -50,14 +51,14 @@ public class TrainerController
     @PreAuthorize("hasRole('TRAINER')")
     public ResponseEntity<?> showSchedule()
     {
-        return ResponseEntity.ok(scheduleRepositoryService.findScheduleByUser(userRepositoryService.findUserByEmail(usersService.userDetails().getEmail())));
+        return ResponseEntity.ok(scheduleService.findScheduleByUser(userService.findUserByEmail(usersService.userDetails().getEmail())));
     }
 
     @GetMapping("/profile")
     @PreAuthorize("hasRole('TRAINER')")
     public ResponseEntity<?> showProfile()
     {
-        return ResponseEntity.ok(userRepositoryService.findUserByEmail(usersService.userDetails().getEmail()));
+        return ResponseEntity.ok(userService.findUserByEmail(usersService.userDetails().getEmail()));
     }
 
     @PatchMapping("/profile")
@@ -72,7 +73,7 @@ public class TrainerController
     @PreAuthorize("hasRole('TRAINER')")
     public ResponseEntity<?> showExercises()
     {
-        return ResponseEntity.ok(exerciseRepository.findAll());
+        return ResponseEntity.ok(exerciseService.findAll());
     }
 
     @PostMapping("/exercise")
@@ -82,7 +83,7 @@ public class TrainerController
         Exercise exercise = new Exercise();
         exercise.setName(exerciseRequest.getName());
         exercise.setDescription(exerciseRequest.getDescription());
-        exerciseRepository.save(exercise);
+        exerciseService.save(exercise);
         return ResponseEntity.ok(new MessageResponse("Create Successfully!"));
     }
 }

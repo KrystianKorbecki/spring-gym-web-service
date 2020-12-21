@@ -4,10 +4,10 @@ import com.api.gym.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AdminService
+public class AdminsService
 {
     UserRepository userRepository;
-    AdminService(UserRepository userRepository)
+    AdminsService(UserRepository userRepository)
     {
         this.userRepository = userRepository;
     }

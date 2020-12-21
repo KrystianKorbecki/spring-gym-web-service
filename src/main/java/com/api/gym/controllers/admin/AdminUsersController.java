@@ -1,11 +1,12 @@
 package com.api.gym.controllers.admin;
 
 import com.api.gym.enums.ERole;
-import com.api.gym.models.User;
 import com.api.gym.payload.request.ChangeActive;
 import com.api.gym.payload.request.EmailRequest;
 import com.api.gym.payload.response.ShowUserResponse;
-import com.api.gym.service.repository.UserRepositoryService;
+import com.api.gym.converters.Converter;
+import com.api.gym.service.repository.RoleService;
+import com.api.gym.service.repository.UserService;
 import com.api.gym.service.users.UsersService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +23,17 @@ import java.util.List;
 public class AdminUsersController
 {
     private final UsersService usersService;
-    private final UserRepositoryService userRepositoryService;
+    private final UserService userService;
+    private final Converter converter;
+    private final RoleService roleService;
 
 
-    AdminUsersController(UsersService usersService, UserRepositoryService userRepositoryService)
+    AdminUsersController(UsersService usersService, UserService userService, Converter converter, RoleService roleService)
     {
         this.usersService = usersService;
-        this.userRepositoryService = userRepositoryService;
+        this.userService = userService;
+        this.converter = converter;
+        this.roleService = roleService;
     }
 
     @GetMapping("/user")
@@ -37,13 +42,13 @@ public class AdminUsersController
     {
         if(email == null)
         {
-            List<ShowUserResponse> showUsers = new ArrayList<>(usersService.findUsersByRole(ERole.ROLE_USER));
+            List<ShowUserResponse> showUsers = new ArrayList<>(converter.convertUserListToShowUserResponseList(userService.findUsersByRole(roleService.findRoleByName(ERole.ROLE_USER))));
             return ResponseEntity.ok(showUsers);
         }
         else
         {
-            User user = userRepositoryService.findUserByEmail(email);
-            return ResponseEntity.ok(user);
+            ShowUserResponse showUserResponse = converter.convertUserToShowUserResponse(userService.findUserByEmail(email));
+            return ResponseEntity.ok(showUserResponse);
         }
     }
 
@@ -60,6 +65,6 @@ public class AdminUsersController
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?>deleteUser(@Valid @RequestBody EmailRequest emailRequest)
     {
-        return ResponseEntity.ok(userRepositoryService.deleteByEmail(emailRequest.getEmail()));
+        return ResponseEntity.ok(userService.deleteByEmail(emailRequest.getEmail()));
     }
 }

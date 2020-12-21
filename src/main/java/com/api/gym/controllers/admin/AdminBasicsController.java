@@ -4,7 +4,9 @@ import com.api.gym.enums.ERole;
 import com.api.gym.models.User;
 import com.api.gym.payload.request.EmailRequest;
 import com.api.gym.payload.response.ShowUserResponse;
-import com.api.gym.service.repository.UserRepositoryService;
+import com.api.gym.converters.Converter;
+import com.api.gym.service.repository.RoleService;
+import com.api.gym.service.repository.UserService;
 import com.api.gym.service.users.UsersService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +23,17 @@ import java.util.List;
 public class AdminBasicsController
 {
     private final UsersService usersService;
-    private final UserRepositoryService userRepositoryService;
+    private final UserService userService;
+    private final Converter converter;
+    private final RoleService roleService;
 
 
-    AdminBasicsController(UsersService usersService, UserRepositoryService userRepositoryService)
+    AdminBasicsController(UsersService usersService, UserService userService, Converter converter, RoleService roleService)
     {
         this.usersService = usersService;
-        this.userRepositoryService = userRepositoryService;
+        this.userService = userService;
+        this.converter = converter;
+        this.roleService = roleService;
     }
 
     @GetMapping("/basic")
@@ -36,12 +42,12 @@ public class AdminBasicsController
     {
         if(email == null)
         {
-            List<ShowUserResponse> showBasicUsers = new ArrayList<>(usersService.findUsersByRole(ERole.ROLE_BASIC));
+            List<ShowUserResponse> showBasicUsers = new ArrayList<>(converter.convertUserListToShowUserResponseCollection(userService.findUsersByRole(roleService.findRoleByName(ERole.ROLE_USER))));
             return ResponseEntity.ok(showBasicUsers);
         }
         else
         {
-            User user = userRepositoryService.findUserByEmail(email);
+            User user = userService.findUserByEmail(email);
             return ResponseEntity.ok(user);
         }
     }
