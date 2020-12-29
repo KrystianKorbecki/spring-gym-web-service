@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -15,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 
 @Data
 @NoArgsConstructor
@@ -52,17 +51,18 @@ public class User
 	@Column(name = "email_address")
 	private String email;
 
+	@Column(name = "email_confirm")
+	private Boolean confirmEmail;
+
+	@Column(name = "confirmation_code")
+	private String confirmationCode;
+
 	@NotBlank
 	@Size(max = 240)
 	private String password;
 
 	@Column(name = "create_date")
 	private Date createDate;
-
-	@NotBlank
-	@Size(max = 6)
-	@Column(name = "code")
-	private String code;
 
 	@Column(name = "id_trainer")
 	private Long idTrainer;

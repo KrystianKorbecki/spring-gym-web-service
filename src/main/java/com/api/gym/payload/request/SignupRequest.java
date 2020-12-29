@@ -45,5 +45,6 @@ public class SignupRequest
     @NotBlank
     private String gender;
 
+    private Boolean confirmEmail;
 
 }

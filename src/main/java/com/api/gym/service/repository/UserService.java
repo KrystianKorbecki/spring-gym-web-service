@@ -28,6 +28,17 @@ public class UserService
         return true;
     }
 
+    public Boolean existsByConfirmationCode(String confirmationCode)
+    {
+        return userRepository.existsByConfirmationCode(confirmationCode);
+    }
+
+
+    public User findByConfirmationCode(String confirmationCode)
+    {
+        return userRepository.findUserByConfirmationCode(confirmationCode).orElseThrow(UserNotFoundException::new);
+    }
+
     public Boolean existsByEmail(String email)
     {
         return userRepository.existsByEmail(email);

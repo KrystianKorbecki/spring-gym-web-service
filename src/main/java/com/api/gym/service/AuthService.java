@@ -1,6 +1,7 @@
 package com.api.gym.service;
 
 import com.api.gym.enums.ERole;
+import com.api.gym.mail.EmailService;
 import com.api.gym.models.Role;
 import com.api.gym.models.User;
 import com.api.gym.payload.request.LoginRequest;
@@ -31,22 +32,24 @@ import java.util.stream.Collectors;
 @Service
 public class AuthService
 {
-    private final GenerateUserCode generateUserCode;
+    private final GenerateCode generateCode;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final RoleService roleService;
+    private final EmailService emailService;
 
-    AuthService(GenerateUserCode generateUserCode, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder,
-                UserService userService, RoleService roleService)
+    AuthService(GenerateCode generateCode, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder,
+                UserService userService, RoleService roleService, EmailService emailService)
     {
-        this.generateUserCode = generateUserCode;
+        this.generateCode = generateCode;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
         this.roleService = roleService;
+        this.emailService = emailService;
     }
 
     public ResponseEntity<?> authenticateUser(LoginRequest loginRequest)
@@ -82,6 +85,7 @@ public class AuthService
         else
         {
             userService.saveUser(convertSignUpRequestToUser(signUpRequest));
+
             return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
         }
     }
@@ -93,15 +97,25 @@ public class AuthService
     public User convertSignUpRequestToUser(SignupRequest signUpRequest)
     {
         User user = new User();
+        String code = generateCode.generateCode();
         user.setLastName(signUpRequest.getLastName());
         user.setUserName(signUpRequest.getUsername());
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setPhoneNumber(signUpRequest.getPhoneNumber());
-        user.setCode(generateUserCode.Generate(6));
+        user.setConfirmationCode(code);
         user.setRoles(setRolesForUser(signUpRequest));
         user.setBirthdayDate(signUpRequest.getBirthdayDate());
         user.setGender(signUpRequest.getGender());
+        if(!signUpRequest.getConfirmEmail())
+        {
+            emailService.sendConfirmEmail(signUpRequest.getEmail(), code);
+            user.setConfirmEmail(false);
+        }
+        else
+        {
+            user.setConfirmEmail(true);
+        }
         return user;
     }
 

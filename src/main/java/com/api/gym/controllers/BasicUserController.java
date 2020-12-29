@@ -31,7 +31,7 @@ public class BasicUserController
     {
         User user = userService.findUserByEmail(usersService.userDetails().getEmail());
         Map<String, String> response = new HashMap<>();
-        response.put("code",user.getCode());
+        response.put("code","String");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

@@ -12,3 +12,6 @@ ALTER TABLE "training_plan_exercise" ADD CONSTRAINT "training_plan_exercise_fk1"
 ALTER TABLE "complete_exercise" ADD CONSTRAINT "complete_exercise_fk0" FOREIGN KEY ("id_training_plan_exercise") REFERENCES "training_plan_exercise"("id");
 
 ALTER TABLE "complete_training_plan" ADD CONSTRAINT "complete_training_plan_fk0" FOREIGN KEY ("id_training_plan") REFERENCES "training_plan"("id");
+
+ALTER TABLE "message" ADD CONSTRAINT "message_fk0" FOREIGN KEY ("from_user_id") REFERENCES "user"("id");
+ALTER TABLE "message" ADD CONSTRAINT "message_fk1" FOREIGN KEY ("to_user_id") REFERENCES "user"("id");

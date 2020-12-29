@@ -7,7 +7,8 @@ CREATE TABLE "user"
     "email_address" varchar(100) NOT NULL UNIQUE,
     "password" varchar(400) NOT NULL,
     "create_date" TIMESTAMP DEFAULT CURRENT_TIMESTAMP(2),
-    "code" varchar(8) UNIQUE,
+    "confirmation_code" varchar(32) UNIQUE,
+    "email_confirm" bool default false,
     "id_trainer" bigint,
     "id_admin" bigint,
     "active" boolean DEFAULT true,
@@ -152,6 +153,19 @@ CREATE TABLE "complete_training_plan"
     "end_date" TIMESTAMP NOT NULL,
     "rest_exercise" INTEGER[] NOT NULL,
     CONSTRAINT "complete_training_plan_pk" PRIMARY KEY ("id")
+) WITH (
+      OIDS=FALSE
+    );
+
+CREATE TABLE "message"
+(
+    "id" serial NOT NULL,
+    "from_user_id" bigint NOT NULL,
+    "to_user_id" bigint NOT NULL,
+    "message" TEXT NOT NULL,
+    "date" TIMESTAMP,
+    "status" varchar(30),
+    CONSTRAINT "message_pk" PRIMARY KEY ("id")
 ) WITH (
       OIDS=FALSE
     );

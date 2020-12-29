@@ -35,6 +35,7 @@ public class GymApplication
         signupRequest.setPassword("password");
         signupRequest.setRole(roles);
         signupRequest.setPhoneNumber("234567821");
+        signupRequest.setConfirmEmail(false);
         authService.registerUser(signupRequest);
     }
 
