@@ -17,11 +17,13 @@ public class AdminController
     @ApiOperation(value = "Show main site for admin")
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Map<String,String>>adminMainSite()
+    public ResponseEntity<Map<String,Integer>>adminMainSite()
     {
-        Map<String, String> response = new LinkedHashMap<>();
-        response.put("newUsersToday", "1000");
-        response.put("soldTicketsToday", "100");
+        Map<String, Integer> response = new LinkedHashMap<>();
+        response.put("newUsersToday", 1000);
+        response.put("soldTicketsToday", 100);
+        response.put("newUsersToday", 50);
+        response.put("newUsersAtMonth", 500);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

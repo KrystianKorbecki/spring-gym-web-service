@@ -8,13 +8,10 @@ import com.api.gym.payload.request.LoginRequest;
 import com.api.gym.payload.request.SignupRequest;
 import com.api.gym.payload.response.JwtResponse;
 import com.api.gym.payload.response.MessageResponse;
-import com.api.gym.repository.RoleRepository;
-import com.api.gym.repository.UserRepository;
 import com.api.gym.security.jwt.JwtUtils;
 import com.api.gym.security.services.UserDetailsImpl;
-import com.api.gym.service.repository.RoleService;
-import com.api.gym.service.repository.UserService;
-import com.api.gym.service.users.UsersService;
+import com.api.gym.repository.implementation.RoleService;
+import com.api.gym.repository.implementation.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +20,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -76,7 +74,8 @@ public class AuthService
                 roles));
     }
 
-    public ResponseEntity<MessageResponse> registerUser(SignupRequest signUpRequest)
+    @Transactional
+    public ResponseEntity<?> registerUser(SignupRequest signUpRequest)
     {
         if (checkIfUserExists(signUpRequest.getEmail()))
         {
@@ -84,9 +83,25 @@ public class AuthService
         }
         else
         {
-            userService.saveUser(convertSignUpRequestToUser(signUpRequest));
+            boolean exc = false;
+            try
+            {
+                userService.saveUser(convertSignUpRequestToUser(signUpRequest));
+            }
+            catch (Exception e)
+            {
+                exc = true;
+            }
 
-            return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+            if(exc == false)
+            {
+                return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+            }
+            else
+            {
+                return (ResponseEntity<?>) ResponseEntity.status(500);
+            }
+
         }
     }
     public boolean checkIfUserExists(String email)
@@ -104,6 +119,8 @@ public class AuthService
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setPhoneNumber(signUpRequest.getPhoneNumber());
         user.setConfirmationCode(code);
+        user.setChatCode(generateCode.generateCode());
+        user.setProfileName(createUserProfileName(signUpRequest.getUsername(), signUpRequest.getLastName()));
         user.setRoles(setRolesForUser(signUpRequest));
         user.setBirthdayDate(signUpRequest.getBirthdayDate());
         user.setGender(signUpRequest.getGender());
@@ -117,6 +134,17 @@ public class AuthService
             user.setConfirmEmail(true);
         }
         return user;
+    }
+
+    public String createUserProfileName(String firstName, String lastName)
+    {
+        String profileName = firstName.toLowerCase() + "." + lastName.toLowerCase();
+        int number = 1;
+        while (userService.existsByProfileName(profileName + number))
+        {
+            number++;
+        }
+        return profileName + number;
     }
 
     public Set<Role> setRolesForUser(SignupRequest signUpRequest)

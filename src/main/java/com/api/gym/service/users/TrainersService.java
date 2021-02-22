@@ -6,11 +6,10 @@ import com.api.gym.models.TrainingPlanExercise;
 import com.api.gym.models.User;
 import com.api.gym.payload.request.TrainingPlanCreateRequest;
 import com.api.gym.payload.request.TrainingPlanExerciseRequest;
-import com.api.gym.service.repository.ExerciseService;
-import com.api.gym.service.repository.TrainingPlanExerciseService;
-import com.api.gym.service.repository.TrainingPlanService;
-import com.api.gym.service.repository.UserService;
-import org.springframework.http.ResponseEntity;
+import com.api.gym.repository.implementation.ExerciseService;
+import com.api.gym.repository.implementation.TrainingPlanExerciseService;
+import com.api.gym.repository.implementation.TrainingPlanService;
+import com.api.gym.repository.implementation.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

@@ -1,19 +1,16 @@
 package com.api.gym.controllers.admin;
 
 import com.api.gym.enums.ERole;
-import com.api.gym.payload.request.ChangeActive;
-import com.api.gym.payload.request.EmailRequest;
 import com.api.gym.payload.response.ShowUserResponse;
 import com.api.gym.converters.Converter;
-import com.api.gym.service.repository.RoleService;
-import com.api.gym.service.repository.UserService;
+import com.api.gym.repository.implementation.RoleService;
+import com.api.gym.repository.implementation.UserService;
 import com.api.gym.service.users.UsersService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,35 +33,41 @@ public class AdminUsersController
         this.roleService = roleService;
     }
 
-    @GetMapping("/user")
+
+    @GetMapping("/users/{pageNumber}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> showUsers(@RequestParam(value = "email", required = false) String email)
+    public ResponseEntity<?> showBasicUsers(@PathVariable int pageNumber, @RequestParam(required = false) int pageSize)
     {
-        if(email == null)
+        if(pageSize == 0)
         {
-            List<ShowUserResponse> showUsers = new ArrayList<>(converter.convertUserListToShowUserResponseList(userService.findUsersByRole(roleService.findRoleByName(ERole.ROLE_USER))));
-            return ResponseEntity.ok(showUsers);
+            pageSize = 20;
         }
-        else
-        {
-            ShowUserResponse showUserResponse = converter.convertUserToShowUserResponse(userService.findUserByEmail(email));
-            return ResponseEntity.ok(showUserResponse);
-        }
+        List<ShowUserResponse> showUsers = new ArrayList<>(converter.convertUserListToShowUserResponseList(userService.findAllUsersByRole(pageNumber, pageSize, roleService.findRoleByName(ERole.ROLE_USER)).getContent()));
+        return ResponseEntity.ok(showUsers);
     }
 
-    @ApiOperation(value = "Change active for trainer")
-    @PatchMapping("/user/active")
+    @GetMapping("/user/{profileName}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?>setActiveValue(@Valid @RequestBody ChangeActive changeActive)
+    public ResponseEntity<?> showBasicUser(@PathVariable String profileName)
     {
-        return usersService.changeActive(changeActive);
+        ShowUserResponse showUserResponse = converter.convertUserToShowUserResponse(userService.findUserByProfileName(profileName));
+        return ResponseEntity.ok(showUserResponse);
     }
 
-    @ApiOperation(value = "Change active for trainer")
-    @DeleteMapping("/user")
+    @ApiOperation(value = "Change active for user")
+    @PatchMapping("/user/{profileName}/active")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?>deleteUser(@Valid @RequestBody EmailRequest emailRequest)
+    public ResponseEntity<?> setActiveValue(@PathVariable String profileName)
     {
-        return ResponseEntity.ok(userService.deleteByEmail(emailRequest.getEmail()));
+        return usersService.changeActive(profileName);
+    }
+
+    @ApiOperation(value = "Delete user")
+    @DeleteMapping("/user/{profileName}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteUser(@PathVariable String profileName)
+    {
+        userService.deleteByProfileName(profileName);
+        return ResponseEntity.ok().build();
     }
 }

@@ -1,8 +1,7 @@
 package com.api.gym.controllers.user;
 
-import com.api.gym.service.repository.TrainingPlanService;
+import com.api.gym.repository.implementation.TrainingPlanService;
 import com.api.gym.service.users.UsersService;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -1,18 +1,22 @@
 package com.api.gym.service.users;
 
 import com.api.gym.enums.ERole;
+import com.api.gym.models.Role;
 import com.api.gym.models.User;
-import com.api.gym.payload.request.ChangeActive;
+import com.api.gym.payload.request.ChangeRole;
 import com.api.gym.payload.request.SignupRequest;
 import com.api.gym.payload.response.MessageResponse;
 import com.api.gym.security.services.UserDetailsImpl;
 import com.api.gym.converters.Converter;
-import com.api.gym.service.repository.RoleService;
-import com.api.gym.service.repository.UserService;
+import com.api.gym.repository.implementation.RoleService;
+import com.api.gym.repository.implementation.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class UsersService
@@ -60,28 +64,77 @@ public class UsersService
         return (UserDetailsImpl) authentication.getPrincipal();
     }
 
-    public ResponseEntity<?> changeActive(ChangeActive changeActive)
+    public ResponseEntity<?> changeActive(String profileName)
     {
-        User user = userService.findUserByEmail(changeActive.getEmail());
-        user.setActive(changeActive.getActive());
+        User user = userService.findUserByProfileName(profileName);
+        user.setActive(!user.getActive());
         userService.saveUser(user);
         return ResponseEntity.ok(new MessageResponse("Active changed"));
     }
 
-    public ResponseEntity<?> changeRoleByEmail(String email, ERole role, UserDetailsImpl userDetails, ERole currentUserRole)
+    public ResponseEntity<?> changeRoleByProfileName(String profileName, ChangeRole changeRole, UserDetailsImpl userDetails)
     {
-        User user = userService.findUserByEmail(email);
-        user.setRoles(converter.convertRoleToRolesSet(roleService.findRoleByName(role)));
-        if(currentUserRole.equals(ERole.ROLE_ADMIN))
+        boolean exception = false;
+        try
         {
-            user.setIdAdmin(userDetails.getId());
+            User user = userService.findUserByProfileName(profileName);
+            if(changeRole.getAddRoles().equals(ERole.ROLE_ADMIN))
+            {
+                user.setRoles(appendRoles(user.getRoles(), changeRole.getAddRoles()));
+                user.setRoles(dropRoleFromSet(user.getRoles(), changeRole.getDeleteRoles()));
+            }
+            else if (changeRole.getAddRoles().equals(ERole.ROLE_TRAINER) || changeRole.getAddRoles().equals(ERole.ROLE_MODERATOR))
+            {
+                user.setRoles(appendRoles(user.getRoles(), changeRole.getAddRoles()));
+                user.setIdAdmin(userDetails.getId());
+            }
+            else
+            {
+                user.setRoles(appendRoles(user.getRoles(), changeRole.getAddRoles()));
+                user.setIdTrainer(userDetails.getId());
+            }
+        }
+        catch (Exception e)
+        {
+            exception = true;
+        }
+
+        if(exception == false)
+        {
+            return (ResponseEntity<?>) ResponseEntity.accepted();
         }
         else
         {
-            user.setIdTrainer(userDetails.getId());
+            return (ResponseEntity<?>) ResponseEntity.status(500);
         }
-        userService.saveUser(user);
-        return ResponseEntity.ok(new MessageResponse("Successfully!"));
+
+    }
+
+    public Set<Role> appendRoles(Set<Role> roleSet, Set<ERole> addRoles)
+    {
+        Set<Role> newRoleSet = new HashSet<>();
+        newRoleSet.addAll(roleSet);
+        for(ERole role:addRoles)
+        {
+            newRoleSet.add(roleService.findRoleByName(role));
+        }
+        return newRoleSet;
+    }
+
+    public Set<Role> dropRoleFromSet(Set<Role> roleSet, Set<ERole> roleToDrop)
+    {
+        for(ERole eRole:roleToDrop)
+        {
+            Role role = roleService.findRoleByName(eRole);
+            roleSet.remove(role);
+        }
+        return roleSet;
+    }
+
+    public Set<Role> dropRoleFromSet(Set<Role> roleSet, ERole roleToDrop)
+    {
+        roleSet.remove(roleService.findRoleByName(roleToDrop));
+        return roleSet;
     }
 
 

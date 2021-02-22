@@ -3,15 +3,14 @@ package com.api.gym.controllers.admin;
 import com.api.gym.enums.ERole;
 import com.api.gym.models.Schedule;
 import com.api.gym.models.User;
-import com.api.gym.payload.request.ChangeActive;
 import com.api.gym.payload.request.ScheduleRequest;
 import com.api.gym.payload.request.ScheduleUpdateRequest;
 import com.api.gym.payload.response.MessageResponse;
 import com.api.gym.payload.response.ShowUserResponse;
 import com.api.gym.converters.Converter;
-import com.api.gym.service.repository.RoleService;
-import com.api.gym.service.repository.ScheduleService;
-import com.api.gym.service.repository.UserService;
+import com.api.gym.repository.implementation.RoleService;
+import com.api.gym.repository.implementation.ScheduleService;
+import com.api.gym.repository.implementation.UserService;
 import com.api.gym.service.users.UsersService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -45,39 +44,42 @@ public class AdminTrainersController
         this.roleService = roleService;
     }
 
-    @GetMapping("/trainer")
+    @GetMapping("/trainers/{pageNumber}")
     @PreAuthorize("hasRole('ADMIN')")
-    @ResponseBody
-    public ResponseEntity<?> showTrainers(@RequestParam(value = "email", required = false) String email)
+    public ResponseEntity<?> showBasicUser(@PathVariable int pageNumber, @RequestParam(required = false) int pageSize)
     {
-        if(email == null)
+        if(pageSize == 0)
         {
-            List<ShowUserResponse> showTrainers = new ArrayList<>(converter.convertUserListToShowUserResponseCollection(userService.findUsersByRole(roleService.findRoleByName(ERole.ROLE_TRAINER))));
-            return ResponseEntity.ok(showTrainers);
+            pageSize = 20;
         }
-        else
-        {
-            User user = userService.findUserByEmail(email);
-            return ResponseEntity.ok(user);
-        }
+        List<ShowUserResponse> showTrainers = new ArrayList<>(converter.convertUserListToShowUserResponseCollection(userService.findAllUsersByRole(pageNumber, pageSize, roleService.findRoleByName(ERole.ROLE_TRAINER)).getContent()));
+        return ResponseEntity.ok(showTrainers);
+    }
+
+    @GetMapping("/trainer/{profileName}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> showBasicUsers(@PathVariable String profileName)
+    {
+        User user = userService.findUserByProfileName(profileName);
+        return ResponseEntity.ok(user);
     }
 
     @ApiOperation(value = "Change active for trainer")
-    @PatchMapping("/trainer/active")
+    @PatchMapping("/trainer/{profileName}/active")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> setActiveValue(@Valid @RequestBody ChangeActive changeActive)
+    public ResponseEntity<?> setActiveValue(@PathVariable String profileName)
     {
-        return usersService.changeActive(changeActive);
+        return usersService.changeActive(profileName);
     }
 
     @ApiOperation(value = "Create schedule for user, you must use date format: " + DATE_FORMAT)
-    @PostMapping("/trainer/schedule")
+    @PostMapping("/trainer/{profileName}/schedule")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> setSchedule(@Valid @RequestBody ScheduleRequest scheduleRequest)
+    public ResponseEntity<?> setSchedule(@Valid @RequestBody ScheduleRequest scheduleRequest, @PathVariable String profileName)
     {
         if(scheduleRequest.getStartDate().size() == scheduleRequest.getEndDate().size())
         {
-            scheduleService.saveScheduleList(scheduleRequest.getStartDate(), scheduleRequest.getEndDate(), userService.findUserByEmail(scheduleRequest.getEmailTrainer()));
+            scheduleService.saveScheduleList(scheduleRequest.getStartDate(), scheduleRequest.getEndDate(), userService.findUserByProfileName(profileName));
             return ResponseEntity.ok(new MessageResponse("Success"));
         }
         else
@@ -86,22 +88,22 @@ public class AdminTrainersController
         }
     }
 
-    @GetMapping("/trainer/schedule")
+    @GetMapping("/trainer/{profileName}/schedule")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> showSchedule(@RequestParam(value = "email", required = true) String email)
+    public ResponseEntity<?> showSchedule(@PathVariable String profileName)
     {
-        List<Schedule> scheduleList = scheduleService.findScheduleByUser(userService.findUserByEmail(email));
+        List<Schedule> scheduleList = scheduleService.findScheduleByUser(userService.findUserByProfileName(profileName));
         return ResponseEntity.ok(scheduleList);
     }
 
-    @PatchMapping("/trainer/schedule")
+    @PatchMapping("/trainer/{profileName}/schedule")
     @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation(value = "Update schedule for user, you must use date format: " + DATE_FORMAT)
-    public ResponseEntity<?> updateSchedule(@Valid @RequestBody ScheduleUpdateRequest scheduleUpdateRequest)
+    public ResponseEntity<?> updateSchedule(@Valid @RequestBody ScheduleUpdateRequest scheduleUpdateRequest, @PathVariable String profileName)
     {
         if(scheduleUpdateRequest.getOldStartDate().size() == scheduleUpdateRequest.getOldEndDate().size() && scheduleUpdateRequest.getNewEndDate().size() == scheduleUpdateRequest.getNewStartDate().size())
         {
-            User user = userService.findUserByEmail(scheduleUpdateRequest.getEmailTrainer());
+            User user = userService.findUserByProfileName(profileName);
             for (int i = 0; i < scheduleUpdateRequest.getOldEndDate().size(); i++)
             {
                 Schedule schedule = scheduleService.findScheduleByStartDateAndEndDateAndUser(scheduleUpdateRequest.getOldStartDate().get(i), scheduleUpdateRequest.getOldEndDate().get(i), user);

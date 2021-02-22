@@ -24,6 +24,4 @@ public class ScheduleRequest
     @JsonFormat(pattern=DATE_FORMAT)
     private List<LocalDateTime> endDate;
 
-    @Email
-    private String emailTrainer;
 }

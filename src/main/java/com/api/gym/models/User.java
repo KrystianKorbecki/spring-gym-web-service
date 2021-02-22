@@ -3,6 +3,7 @@ package com.api.gym.models;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -24,7 +25,7 @@ import java.util.Set;
 			@UniqueConstraint(columnNames = "user_name"),
 			@UniqueConstraint(columnNames = "email_address")
 		})
-public class User
+public class User extends RepresentationModel<User>
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,6 +48,11 @@ public class User
 
 	@NotBlank
 	@Size(max = 50)
+	@Column(name = "profile_name")
+	private String profileName;
+
+	@NotBlank
+	@Size(max = 50)
 	@Email
 	@Column(name = "email_address")
 	private String email;
@@ -56,6 +62,9 @@ public class User
 
 	@Column(name = "confirmation_code")
 	private String confirmationCode;
+
+	@Column(name = "chat_code")
+	private String chatCode;
 
 	@NotBlank
 	@Size(max = 240)
@@ -71,7 +80,6 @@ public class User
 	private Long idAdmin;
 
 	@Column(name = "active")
-	@NotBlank
 	private Boolean active;
 
 	@Temporal(TemporalType.DATE)
@@ -81,13 +89,13 @@ public class User
 	@Column(name = "gender")
 	private String gender;
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(	name = "role_users",
 				joinColumns = @JoinColumn(name = "id_user"),
 				inverseJoinColumns = @JoinColumn(name = "id_role"))
 	private Set<Role> roles = new HashSet<>();
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(	name = "user_ticket",
 			joinColumns = @JoinColumn(name = "id_user"),
 			inverseJoinColumns = @JoinColumn(name = "id_ticket"))
@@ -101,5 +109,7 @@ public class User
 	@JoinColumn(name = "id")
 	private List<Schedule> schedules = new ArrayList<>();
 
-
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "id")
+	private List<Message> messages = new ArrayList<>();
 }

@@ -2,11 +2,10 @@ package com.api.gym.controllers.trainer;
 
 import com.api.gym.enums.ERole;
 import com.api.gym.models.*;
-import com.api.gym.payload.request.ChangeActive;
 import com.api.gym.payload.request.EmailRequest;
 import com.api.gym.payload.request.TrainingPlanCreateRequest;
 import com.api.gym.converters.Converter;
-import com.api.gym.service.repository.*;
+import com.api.gym.repository.implementation.*;
 import com.api.gym.service.users.TrainersService;
 import com.api.gym.service.users.UsersService;
 import io.swagger.annotations.ApiOperation;
@@ -64,19 +63,20 @@ public class TrainerUsersController
         }
     }
 
-    @DeleteMapping("/user")
+    @DeleteMapping("/user/{profileName}")
     @PreAuthorize("hasRole('TRAINER')")
-    public ResponseEntity<?>deleteUser(@Valid @RequestBody EmailRequest emailRequest)
+    public ResponseEntity<?>deleteUser(@PathVariable String profileName)
     {
-        return ResponseEntity.ok(userService.deleteByEmail(emailRequest.getEmail()));
+        userService.deleteByProfileName(profileName);
+        return ResponseEntity.ok().build();
     }
 
     @ApiOperation(value = "Change active for user")
-    @PatchMapping("/user/active")
+    @PatchMapping("/user/{email}/active")
     @PreAuthorize("hasRole('TRAINER')")
-    public ResponseEntity<?>setActiveValue(@Valid @RequestBody ChangeActive changeActive)
+    public ResponseEntity<?>setActiveValue(@PathVariable String email)
     {
-        return usersService.changeActive(changeActive);
+        return usersService.changeActive(email);
     }
 
     @GetMapping("/user/training")

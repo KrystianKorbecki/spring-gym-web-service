@@ -2,11 +2,12 @@ package com.api.gym.controllers.trainer;
 
 import com.api.gym.enums.ERole;
 import com.api.gym.models.User;
+import com.api.gym.payload.request.ChangeRole;
 import com.api.gym.payload.request.EmailRequest;
 import com.api.gym.payload.response.ShowUserResponse;
 import com.api.gym.converters.Converter;
-import com.api.gym.service.repository.RoleService;
-import com.api.gym.service.repository.UserService;
+import com.api.gym.repository.implementation.RoleService;
+import com.api.gym.repository.implementation.UserService;
 import com.api.gym.service.users.UsersService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,34 +36,41 @@ public class TrainerBasicController
         this.converter = converter;
     }
 
-    @GetMapping("/basic")
+    @GetMapping("/basics/{pageNumber}")
     @PreAuthorize("hasRole('TRAINER')")
-    public ResponseEntity<?> showBasicUsers(@RequestParam(value = "email", required = false) String email)
+    public ResponseEntity<?> showBasicUsers(@PathVariable int pageNumber, @RequestParam(required = false) int pageSize)
     {
-        if(email == null)
+        if(pageSize == 0)
         {
-            List<ShowUserResponse> showBasicUsers = new ArrayList<>(converter.convertUserListToShowUserResponseCollection(userService.findUsersByRole(roleService.findRoleByName(ERole.ROLE_BASIC))));
-            return ResponseEntity.ok(showBasicUsers);
+            pageSize = 20;
         }
-        else
-        {
-            User user = userService.findUserByEmail(email);
-            return ResponseEntity.ok(user);
-        }
+        List<ShowUserResponse> showBasicUsers = new ArrayList<>(converter.convertUserListToShowUserResponseCollection(userService.findAllUsersByRole(pageNumber, pageSize, roleService.findRoleByName(ERole.ROLE_BASIC)).getContent()));
+        return ResponseEntity.ok(showBasicUsers);
     }
 
-    @PatchMapping("/basic")
+    @GetMapping("/basic/{profileName}")
     @PreAuthorize("hasRole('TRAINER')")
-    public ResponseEntity<?> addUser(@Valid @RequestBody EmailRequest email)
+    public ResponseEntity<?> showBasicUsers(@PathVariable String profileName)
     {
-        return new ResponseEntity<>(usersService.changeRoleByEmail(email.getEmail(), ERole.ROLE_USER, usersService.userDetails(), ERole.ROLE_TRAINER), HttpStatus.OK);
+        return ResponseEntity.ok(userService.findUserByProfileName(profileName));
+    }
+
+    @PatchMapping("/basic/{profileName}/")
+    @PreAuthorize("hasRole('TRAINER')")
+    public ResponseEntity<?> addUser(@PathVariable String profileName)
+    {
+        ChangeRole changeRole = new ChangeRole();
+        changeRole.setAddRoles(converter.convertRoleToRolesSet(ERole.ROLE_USER));
+        changeRole.setDeleteRoles(converter.convertRoleToRolesSet(ERole.ROLE_BASIC));
+        return new ResponseEntity<>(usersService.changeRoleByProfileName(profileName, changeRole, usersService.userDetails()), HttpStatus.OK);
     }
 
 
-    @DeleteMapping("/basic")
+    @DeleteMapping("/basic/{profileName}")
     @PreAuthorize("hasRole('TRAINER')")
-    public ResponseEntity<?>deleteBasic(@Valid @RequestBody EmailRequest emailRequest)
+    public ResponseEntity<?>deleteBasic(@PathVariable String profileName)
     {
-        return ResponseEntity.ok(userService.deleteByEmail(emailRequest.getEmail()));
+        userService.deleteByProfileName(profileName);
+        return ResponseEntity.ok().build();
     }
 }

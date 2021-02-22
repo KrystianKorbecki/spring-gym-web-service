@@ -4,12 +4,9 @@ import com.api.gym.mail.EmailService;
 import com.api.gym.models.User;
 import com.api.gym.payload.request.ChangePassword;
 import com.api.gym.payload.response.MessageResponse;
-import com.api.gym.repository.UserRepository;
-import com.api.gym.service.repository.UserService;
-import org.springframework.beans.factory.annotation.Value;
+import com.api.gym.repository.implementation.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;

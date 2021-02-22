@@ -8,13 +8,16 @@ CREATE TABLE "user"
     "password" varchar(400) NOT NULL,
     "create_date" TIMESTAMP DEFAULT CURRENT_TIMESTAMP(2),
     "confirmation_code" varchar(32) UNIQUE,
+    "chat_code" varchar(32) UNIQUE,
     "email_confirm" bool default false,
     "id_trainer" bigint,
     "id_admin" bigint,
     "active" boolean DEFAULT true,
     "email_confirmed" boolean DEFAULT false,
+    "profile_name" varchar(50) UNIQUE  NOT NULL,
     "birthday_date" date,
     "gender" varchar(10),
+    "id_profile" int,
     CONSTRAINT "user_pk" PRIMARY KEY ("id")
 ) WITH (
       OIDS=FALSE
@@ -89,24 +92,26 @@ CREATE TABLE "coupon"
     );
 
 
-CREATE TABLE "exercise" (
-                            "id" serial NOT NULL,
-                            "name" varchar(20) NOT NULL,
-                            "description" TEXT NOT NULL,
-                            CONSTRAINT "exercise_pk" PRIMARY KEY ("id")
+CREATE TABLE "exercise"
+(
+    "id" serial NOT NULL,
+    "name" varchar(20) NOT NULL,
+    "description" TEXT NOT NULL,
+    CONSTRAINT "exercise_pk" PRIMARY KEY ("id")
 ) WITH (
       OIDS=FALSE
     );
 
 
 
-CREATE TABLE "training_plan" (
-                                 "id" serial NOT NULL,
-                                 "id_user" bigint NOT NULL,
-                                 "id_trainer" bigint NOT NULL,
-                                 "day_of_week" varchar(10) NOT NULL,
-                                 "propose_rest_exercise" INTEGER[] NOT NULL,
-                                 CONSTRAINT "training_plan_pk" PRIMARY KEY ("id")
+CREATE TABLE "training_plan"
+(
+    "id" serial NOT NULL,
+    "id_user" bigint NOT NULL,
+    "id_trainer" bigint NOT NULL,
+    "day_of_week" varchar(10) NOT NULL,
+    "propose_rest_exercise" INTEGER[] NOT NULL,
+    CONSTRAINT "training_plan_pk" PRIMARY KEY ("id")
 ) WITH (
       OIDS=FALSE
     );
@@ -169,6 +174,17 @@ CREATE TABLE "message"
 ) WITH (
       OIDS=FALSE
     );
+
+CREATE TABLE "profile"
+(
+    "id" serial NOT NULL,
+    "description" TEXT NOT NULL,
+    CONSTRAINT "profile_pk" PRIMARY KEY ("id")
+) WITH (
+      OIDS=FALSE
+    );
+
+
 
 
 

@@ -11,6 +11,7 @@ public class ShowUserResponse
 {
     String userName;
     String lastName;
-    String email;
+    String profileName;
     String phoneNumber;
+    boolean active;
 }

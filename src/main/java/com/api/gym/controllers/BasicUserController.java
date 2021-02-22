@@ -1,8 +1,7 @@
 package com.api.gym.controllers;
 
 import com.api.gym.models.User;
-import com.api.gym.repository.UserRepository;
-import com.api.gym.service.repository.UserService;
+import com.api.gym.repository.implementation.UserService;
 import com.api.gym.service.users.UsersService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

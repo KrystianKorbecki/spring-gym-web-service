@@ -1,7 +1,6 @@
 package com.api.gym.service;
 
-import com.api.gym.repository.UserRepository;
-import com.api.gym.service.repository.UserService;
+import com.api.gym.repository.implementation.UserService;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
