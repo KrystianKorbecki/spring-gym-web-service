@@ -1,6 +1,8 @@
 package com.api.gym.service.repository;
 
 
+import com.api.gym.TestDataPrepare;
+import com.api.gym.enums.EGender;
 import com.api.gym.enums.ERole;
 import com.api.gym.exception.UserNotFoundException;
 import com.api.gym.models.Role;
@@ -27,104 +29,46 @@ public class UserServiceTest
     @InjectMocks
     UserService userService;
 
-    User user = new User();
-    User admin = new User();
-    User basic = new User();
-    User trainer = new User();
-    User superAdmin = new User();
-    User moderator = new User();
-    Set<Role> adminRoleSet = createRoleSet(ERole.ROLE_ADMIN);
-    Set<Role> trainerRoleSet = createRoleSet(ERole.ROLE_TRAINER);
-    Set<Role> moderatorRoleSet = createRoleSet(ERole.ROLE_MODERATOR);
-    Set<Role> superAdminRoleSet = createRoleSet(ERole.ROLE_SUPERADMIN);
-    Set<Role> userRoleSet = createRoleSet(ERole.ROLE_USER);
-    Set<Role> basicRoleSet = createRoleSet(ERole.ROLE_BASIC);
-
-    @Before
-    public void prepareUserData()
-    {
-        admin = createUser(ERole.ROLE_ADMIN, "admin");
-        user = createUser(ERole.ROLE_USER, "user");
-        trainer = createUser(ERole.ROLE_TRAINER, "trainer");
-        superAdmin = createUser(ERole.ROLE_SUPERADMIN, "superadmin");
-        moderator = createUser(ERole.ROLE_MODERATOR, "moderator");
-        basic = createUser(ERole.ROLE_BASIC, "basic");
-    }
-    public Optional<List<User>> optionalUserList(User user)
-    {
-        List<User> userList = new ArrayList<>();
-        userList.add(user);
-        Optional<List<User>> listOfOptionalAdminUser = Optional.of(userList);
-        return listOfOptionalAdminUser;
-    }
-
-
-    public Set<Role> createRoleSet(ERole eRole)
-    {
-        Set<Role> roleSet = new HashSet<>();
-        Role role = new Role(null, eRole);
-        roleSet.add(role);
-        return roleSet;
-    }
-
-    public User createUser(ERole eRole, String name)
-    {
-        User user = new User();
-        UUID uuid = UUID.randomUUID();
-        Random random = new Random();
-        user.setPassword("password");
-        user.setChatCode(uuid.toString());
-        user.setConfirmEmail(true);
-        user.setConfirmationCode(uuid.toString());
-        user.setUserName(name);
-        user.setLastName(name);
-        user.setGender("Male");
-        user.setActive(true);
-        user.setPhoneNumber("123456789");
-        user.setRoles(createRoleSet(eRole));
-        user.setEmail(name + "@" + name + ".pl");
-        user.setId(null);
-        return user;
-    }
+    TestDataPrepare testDataPrepare = new TestDataPrepare();
 
     @Test
     public void when_enter_email_then_user_will_be_found()
     {
         //given
-        Optional<User> userOptional =Optional.of(user);
+        Optional<User> userOptional =Optional.of(testDataPrepare.getUser());
         //when
-        Mockito.when(userRepository.findUserByEmail(user.getEmail())).thenReturn(userOptional);
+        Mockito.when(userRepository.findUserByEmail(testDataPrepare.getUser().getEmail())).thenReturn(userOptional);
         //then
-        Assert.assertEquals(user.getEmail(), userService.findUserByEmail(user.getEmail()).getEmail());
-        Assert.assertThrows(UserNotFoundException.class, ()-> userService.findUserByEmail(user.getEmail() + "t"));
+        Assert.assertEquals(testDataPrepare.getUser().getEmail(), userService.findUserByEmail(testDataPrepare.getUser().getEmail()).getEmail());
+        Assert.assertThrows(UserNotFoundException.class, ()-> userService.findUserByEmail(testDataPrepare.getUser().getEmail() + "t"));
     }
 
     @Test
     public void when_enter_roles_then_users_will_be_found()
     {
         //given
-        Optional<List<User>> listOfOptionalAdminUser = optionalUserList(admin);
-        Optional<List<User>> listOfOptionalUser = optionalUserList(user);
-        Optional<List<User>> listOfOptionalModeratorUser = optionalUserList(moderator);
-        Optional<List<User>> listOfOptionalSuperAdminUser = optionalUserList(superAdmin);
-        Optional<List<User>> listOfOptionalTrainerUser = optionalUserList(trainer);
-        Optional<List<User>> listOfOptionalBasicUser = optionalUserList(basic);
+        Optional<List<User>> listOfOptionalAdminUser = testDataPrepare.optionalUserList(testDataPrepare.getAdmin());
+        Optional<List<User>> listOfOptionalUser = testDataPrepare.optionalUserList(testDataPrepare.getUser());
+        Optional<List<User>> listOfOptionalModeratorUser = testDataPrepare.optionalUserList(testDataPrepare.getModerator());
+        Optional<List<User>> listOfOptionalSuperAdminUser = testDataPrepare.optionalUserList(testDataPrepare.getSuperAdmin());
+        Optional<List<User>> listOfOptionalTrainerUser = testDataPrepare.optionalUserList(testDataPrepare.getTrainer());
+        Optional<List<User>> listOfOptionalBasicUser = testDataPrepare.optionalUserList(testDataPrepare.getBasic());
 
         //when
-        Mockito.when(userRepository.findUsersByRolesIn(adminRoleSet)).thenReturn(listOfOptionalAdminUser);
-        Mockito.when(userRepository.findUsersByRolesIn(userRoleSet)).thenReturn(listOfOptionalUser);
-        Mockito.when(userRepository.findUsersByRolesIn(moderatorRoleSet)).thenReturn(listOfOptionalModeratorUser);
-        Mockito.when(userRepository.findUsersByRolesIn(superAdminRoleSet)).thenReturn(listOfOptionalSuperAdminUser);
-        Mockito.when(userRepository.findUsersByRolesIn(trainerRoleSet)).thenReturn(listOfOptionalTrainerUser);
-        Mockito.when(userRepository.findUsersByRolesIn(basicRoleSet)).thenReturn(listOfOptionalBasicUser);
+        Mockito.when(userRepository.findUsersByRolesIn(testDataPrepare.getAdminRoleSet())).thenReturn(listOfOptionalAdminUser);
+        Mockito.when(userRepository.findUsersByRolesIn(testDataPrepare.getUserRoleSet())).thenReturn(listOfOptionalUser);
+        Mockito.when(userRepository.findUsersByRolesIn(testDataPrepare.getModeratorRoleSet())).thenReturn(listOfOptionalModeratorUser);
+        Mockito.when(userRepository.findUsersByRolesIn(testDataPrepare.getSuperAdminRoleSet())).thenReturn(listOfOptionalSuperAdminUser);
+        Mockito.when(userRepository.findUsersByRolesIn(testDataPrepare.getTrainerRoleSet())).thenReturn(listOfOptionalTrainerUser);
+        Mockito.when(userRepository.findUsersByRolesIn(testDataPrepare.getBasicRoleSet())).thenReturn(listOfOptionalBasicUser);
 
         //then
-        Assert.assertEquals(listOfOptionalAdminUser.get(), userService.findAllUsersByRoles(adminRoleSet));
-        Assert.assertEquals(listOfOptionalUser.get(), userService.findAllUsersByRoles(userRoleSet));
-        Assert.assertEquals(listOfOptionalModeratorUser.get(), userService.findAllUsersByRoles(moderatorRoleSet));
-        Assert.assertEquals(listOfOptionalSuperAdminUser.get(), userService.findAllUsersByRoles(superAdminRoleSet));
-        Assert.assertEquals(listOfOptionalTrainerUser.get(), userService.findAllUsersByRoles(trainerRoleSet));
-        Assert.assertEquals(listOfOptionalBasicUser.get(), userService.findAllUsersByRoles(basicRoleSet));
+        Assert.assertEquals(listOfOptionalAdminUser.get(), userService.findAllUsersByRoles(testDataPrepare.getAdminRoleSet()));
+        Assert.assertEquals(listOfOptionalUser.get(), userService.findAllUsersByRoles(testDataPrepare.getUserRoleSet()));
+        Assert.assertEquals(listOfOptionalModeratorUser.get(), userService.findAllUsersByRoles(testDataPrepare.getModeratorRoleSet()));
+        Assert.assertEquals(listOfOptionalSuperAdminUser.get(), userService.findAllUsersByRoles(testDataPrepare.getSuperAdminRoleSet()));
+        Assert.assertEquals(listOfOptionalTrainerUser.get(), userService.findAllUsersByRoles(testDataPrepare.getTrainerRoleSet()));
+        Assert.assertEquals(listOfOptionalBasicUser.get(), userService.findAllUsersByRoles(testDataPrepare.getBasicRoleSet()));
     }
 
     @Test
@@ -133,10 +77,10 @@ public class UserServiceTest
         //given
         Optional<List<User>> emptyOptionalList = Optional.empty();
         //when
-        Mockito.when(userRepository.findUsersByRolesIn(adminRoleSet)).thenReturn(emptyOptionalList);
+        Mockito.when(userRepository.findUsersByRolesIn(testDataPrepare.getAdminRoleSet())).thenReturn(emptyOptionalList);
         //then
-        Assert.assertThrows(UserNotFoundException.class, ()-> userService.findAllUsersByRoles(adminRoleSet));
-        Assert.assertThrows(UserNotFoundException.class, ()-> userService.findAllUsersByRoles(trainerRoleSet));
+        Assert.assertThrows(UserNotFoundException.class, ()-> userService.findAllUsersByRoles(testDataPrepare.getAdminRoleSet()));
+        Assert.assertThrows(UserNotFoundException.class, ()-> userService.findAllUsersByRoles(testDataPrepare.getTrainerRoleSet()));
 
     }
 
@@ -144,34 +88,34 @@ public class UserServiceTest
     public void when_enter_email_then_return_true()
     {
         //when
-        Mockito.when(userRepository.existsByEmail(user.getEmail())).thenReturn(true);
+        Mockito.when(userRepository.existsByEmail(testDataPrepare.getUser().getEmail())).thenReturn(true);
 
         //then
-        Assert.assertEquals(true, userService.existsByEmail(user.getEmail()));
+        Assert.assertEquals(true, userService.existsByEmail(testDataPrepare.getUser().getEmail()));
     }
 
     @Test
     public void when_enter_email_then_return_false()
     {
         //when
-        Mockito.when(userRepository.existsByEmail(admin.getEmail())).thenReturn(false);
+        Mockito.when(userRepository.existsByEmail(testDataPrepare.getAdmin().getEmail())).thenReturn(false);
 
         //then
-        Assert.assertEquals(false, userService.existsByEmail(admin.getEmail()));
-        Assert.assertEquals(false, userService.existsByEmail(trainer.getEmail()));
+        Assert.assertEquals(false, userService.existsByEmail(testDataPrepare.getAdmin().getEmail()));
+        Assert.assertEquals(false, userService.existsByEmail(testDataPrepare.getTrainer().getEmail()));
     }
 
     @Test
     public void when_enter_confirmation_code_then_user_will_be_found()
     {
         //given
-        Optional<User> adminOptional = Optional.of(admin);
+        Optional<User> adminOptional = Optional.of(testDataPrepare.getAdmin());
 
         //when
-        Mockito.when(userRepository.findUserByConfirmationCode(admin.getConfirmationCode())).thenReturn(adminOptional);
+        Mockito.when(userRepository.findUserByConfirmationCode(testDataPrepare.getAdmin().getConfirmationCode())).thenReturn(adminOptional);
 
         //then
-        Assert.assertEquals(admin, userService.findByConfirmationCode(admin.getConfirmationCode()));
+        Assert.assertEquals(testDataPrepare.getAdmin(), userService.findByConfirmationCode(testDataPrepare.getAdmin().getConfirmationCode()));
     }
 
     @Test
@@ -180,11 +124,11 @@ public class UserServiceTest
         Optional<User> emptyOptional = Optional.empty();
 
         //when
-        Mockito.when(userRepository.findUserByConfirmationCode(admin.getConfirmationCode())).thenReturn(emptyOptional);
+        Mockito.when(userRepository.findUserByConfirmationCode(testDataPrepare.getAdmin().getConfirmationCode())).thenReturn(emptyOptional);
 
         //then
-        Assert.assertThrows(UserNotFoundException.class, () -> userService.findByConfirmationCode(admin.getConfirmationCode()));
-        Assert.assertThrows(UserNotFoundException.class, () -> userService.findByConfirmationCode(user.getConfirmationCode()));
+        Assert.assertThrows(UserNotFoundException.class, () -> userService.findByConfirmationCode(testDataPrepare.getAdmin().getConfirmationCode()));
+        Assert.assertThrows(UserNotFoundException.class, () -> userService.findByConfirmationCode(testDataPrepare.getUser().getConfirmationCode()));
     }
 
 }

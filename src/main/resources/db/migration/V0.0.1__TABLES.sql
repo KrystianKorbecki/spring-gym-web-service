@@ -17,7 +17,10 @@ CREATE TABLE "user"
     "profile_name" varchar(50) UNIQUE  NOT NULL,
     "birthday_date" date,
     "gender" varchar(10),
-    "id_profile" int,
+    "photo_name" varchar(70),
+    "id_profile" bigint,
+    "id_address" bigint,
+    "id_gym_address" bigint,
     CONSTRAINT "user_pk" PRIMARY KEY ("id")
 ) WITH (
       OIDS=FALSE
@@ -175,10 +178,63 @@ CREATE TABLE "message"
       OIDS=FALSE
     );
 
+CREATE TABLE "reports"
+(
+    "id" serial NOT NULL,
+    "create_date" DATE NOT NULL,
+    "path" varchar(70) NOT NULL,
+    "name" varchar(70) NOT NULL,
+    CONSTRAINT "reports_pk" PRIMARY KEY ("id")
+) WITH (
+      OIDS=FALSE
+    );
+
+
+
+CREATE TABLE "user_reports"
+(
+    "id" serial NOT NULL,
+    "id_user" bigint NOT NULL,
+    "id_reports" bigint NOT NULL,
+    CONSTRAINT "user_reports_pk" PRIMARY KEY ("id")
+) WITH (
+      OIDS=FALSE
+    );
+
+
+CREATE TABLE "address"
+(
+    "id" serial NOT NULL,
+    "city" varchar(70) NOT NULL,
+    "street" varchar(70),
+    "house_number" varchar(70) NOT NULL,
+    "apartment_number" varchar(70),
+    "voivodeship" varchar(20) NOT NULL,
+    "postal_code" varchar(6) NOT NULL,
+    CONSTRAINT "address_pk" PRIMARY KEY ("id")
+) WITH (
+      OIDS=FALSE
+    );
+
+
+
+CREATE TABLE "gym_address"
+(
+    "id" serial NOT NULL,
+    "id_address" bigint NOT NULL,
+    "place_name" varchar(70),
+    CONSTRAINT "gym_address_pk" PRIMARY KEY ("id")
+) WITH (
+      OIDS=FALSE
+    );
+
+
+
 CREATE TABLE "profile"
 (
     "id" serial NOT NULL,
-    "description" TEXT NOT NULL,
+    "description" TEXT,
+    "public" BOOLEAN NOT NULL DEFAULT 'true',
     CONSTRAINT "profile_pk" PRIMARY KEY ("id")
 ) WITH (
       OIDS=FALSE
@@ -186,7 +242,36 @@ CREATE TABLE "profile"
 
 
 
+CREATE TABLE "photo"
+(
+    "id" serial NOT NULL,
+    "id_profile" bigint,
+    "path" varchar(70) NOT NULL,
+    "name" varchar(70) NOT NULL,
+    "description" TEXT,
+    "like" bigint NOT NULL,
+    "unlike" bigint NOT NULL,
+    CONSTRAINT "photo_pk" PRIMARY KEY ("id")
+) WITH (
+      OIDS=FALSE
+    );
 
+
+
+CREATE TABLE "comment"
+(
+    "id" serial NOT NULL,
+    "id_photo" bigint,
+    "id_comment" bigint NOT NULL,
+    "id_user" bigint NOT NULL,
+    "date" DATE NOT NULL,
+    "description" TEXT NOT NULL,
+    "like" bigint NOT NULL,
+    "unlike" bigint NOT NULL,
+    CONSTRAINT "comment_pk" PRIMARY KEY ("id")
+) WITH (
+      OIDS=FALSE
+    );
 
 
 

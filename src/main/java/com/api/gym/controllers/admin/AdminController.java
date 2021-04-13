@@ -17,7 +17,7 @@ public class AdminController
     @ApiOperation(value = "Show main site for admin")
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Map<String,Integer>>adminMainSite()
+    public ResponseEntity<?>adminMainSite()
     {
         Map<String, Integer> response = new LinkedHashMap<>();
         response.put("newUsersToday", 1000);
@@ -26,4 +26,11 @@ public class AdminController
         response.put("newUsersAtMonth", 500);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+//    @GetMapping(name = "/profile")
+//    @PreAuthorize("hasRole('ADMIN')")
+//    public ResponseEntity<?> adminProfile()
+//    {
+//        return
+//    }
 }

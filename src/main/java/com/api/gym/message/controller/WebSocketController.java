@@ -34,7 +34,7 @@ public class WebSocketController
   public Set<ShowAllUsers> registerUser(String userToken)
   {
     User user = userService.findUserByEmail(jwtUtils.getUserNameFromJwtToken(userToken));
-    simpMessagingTemplate.convertAndSend("/topic/newMember", user.getChatCode());
+    simpMessagingTemplate.convertAndSend("/topic/newMember", user.getProfileName());
     return messagesService.showChatUsers(user.getEmail());
   }
   

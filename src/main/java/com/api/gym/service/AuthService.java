@@ -12,6 +12,8 @@ import com.api.gym.security.jwt.JwtUtils;
 import com.api.gym.security.services.UserDetailsImpl;
 import com.api.gym.repository.implementation.RoleService;
 import com.api.gym.repository.implementation.UserService;
+import org.springframework.hateoas.Link;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -50,65 +52,49 @@ public class AuthService
         this.emailService = emailService;
     }
 
-    public ResponseEntity<?> authenticateUser(LoginRequest loginRequest)
+    /**
+     * The method implements an authentication algorithm, if wrong data is provided, Exception is returned
+     * @param loginRequest It's submitted form with email and password
+     * @return {@link JwtResponse} This is the class that contains the required authentication data
+     */
+    public JwtResponse authenticateUser(LoginRequest loginRequest)
     {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         User authUser= userService.findUserByEmail(userDetails.getEmail());
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new JwtResponse(jwt,
-                userDetails.getId(),
-                authUser.getLastName(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                authUser.getPhoneNumber(),
-                authUser.getCreateDate(),
-                roles));
+        return new JwtResponse(jwt, authUser.getUserName(), authUser.getLastName(), authUser.getProfileName(), authUser.getRoles(), authUser.getActive(), authUser.getConfirmEmail());
     }
 
     @Transactional
-    public ResponseEntity<?> registerUser(SignupRequest signUpRequest)
+    public ResponseEntity<MessageResponse> registerUser(SignupRequest signUpRequest, Link link)
     {
-        if (checkIfUserExists(signUpRequest.getEmail()))
+        if (userService.existsByEmail(signUpRequest.getEmail()))
         {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+            return ResponseEntity.badRequest().body(new MessageResponse("Email is already in use!").add(link));
         }
         else
         {
-            boolean exc = false;
-            try
-            {
+            try{
                 userService.saveUser(convertSignUpRequestToUser(signUpRequest));
-            }
-            catch (Exception e)
+            }catch (Exception e)
             {
-                exc = true;
+                return new ResponseEntity<>(new MessageResponse("Internal error").add(link), HttpStatus.INTERNAL_SERVER_ERROR);
+            }finally {
+                return ResponseEntity.ok(new MessageResponse("User registered successfully!").add(link));
             }
-
-            if(exc == false)
-            {
-                return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
-            }
-            else
-            {
-                return (ResponseEntity<?>) ResponseEntity.status(500);
-            }
-
         }
     }
-    public boolean checkIfUserExists(String email)
-    {
-        return userService.existsByEmail(email);
-    }
 
+    /**
+     * The method convert {@link SignupRequest} to {@link User} class
+     * @param signUpRequest This is the submitted registration form
+     * @return {@link User} class after convert
+     */
     public User convertSignUpRequestToUser(SignupRequest signUpRequest)
     {
         User user = new User();
@@ -119,11 +105,11 @@ public class AuthService
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setPhoneNumber(signUpRequest.getPhoneNumber());
         user.setConfirmationCode(code);
-        user.setChatCode(generateCode.generateCode());
         user.setProfileName(createUserProfileName(signUpRequest.getUsername(), signUpRequest.getLastName()));
-        user.setRoles(setRolesForUser(signUpRequest));
+        user.setRoles(setRolesForUser(signUpRequest.getRole()));
         user.setBirthdayDate(signUpRequest.getBirthdayDate());
         user.setGender(signUpRequest.getGender());
+        user.setActive(true);
         if(!signUpRequest.getConfirmEmail())
         {
             emailService.sendConfirmEmail(signUpRequest.getEmail(), code);
@@ -136,6 +122,12 @@ public class AuthService
         return user;
     }
 
+    /**
+     * This method creates a unique name for each user
+     * @param firstName It's taken from {@link SignupRequest}
+     * @param lastName It's taken from {@link SignupRequest}
+     * @return String with linked word firstName + lastName + number(If there are several users with the same first and last names)
+     */
     public String createUserProfileName(String firstName, String lastName)
     {
         String profileName = firstName.toLowerCase() + "." + lastName.toLowerCase();
@@ -147,9 +139,14 @@ public class AuthService
         return profileName + number;
     }
 
-    public Set<Role> setRolesForUser(SignupRequest signUpRequest)
+    /**
+     * This method assigns the user the appropriate {@link Role} entered in the form (The method is only for tests)
+     * @param signUpRequestRole It's contains submitted Roles name by {@link SignupRequest} form
+     * @return {@link Set<Role>} This is the Set with the Roles found in the database
+     */
+    public Set<Role> setRolesForUser(Set<String> signUpRequestRole)
     {
-        Set<String> strRoles = signUpRequest.getRole();
+        Set<String> strRoles = signUpRequestRole;
         Set<Role> roles = new HashSet<>();
         if (strRoles == null)
         {

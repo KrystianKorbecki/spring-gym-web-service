@@ -1,6 +1,9 @@
 package com.api.gym.exception;
 
+import com.api.gym.payload.response.MessageResponse;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -12,9 +15,8 @@ public class TrainingPlanExerciseNotFoundAdvice
 {
     @ResponseBody
     @ExceptionHandler(TrainingPlanExerciseNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String trainingPlanExerciseNotFoundHandler(TrainingPlanExerciseNotFoundException exception)
+    public ResponseEntity<?> trainingPlanExerciseNotFoundHandler(TrainingPlanExerciseNotFoundException exception)
     {
-        return exception.getMessage();
+        return new ResponseEntity<>(new MessageResponse(exception.getMessage()), HttpStatus.valueOf(404));
     }
 }

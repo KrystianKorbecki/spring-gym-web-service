@@ -16,13 +16,16 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer
 {
 	private final UserDetailsServiceImpl userDetailsService;
 	private AuthEntryPointJwt unauthorizedHandler;
@@ -70,4 +73,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
+
+//	public void addCorsMappings(CorsRegistry registry) {
+//		registry.addMapping("/signup").allowedOrigins("http://localhost:8080");
+//	}
+
+
 }

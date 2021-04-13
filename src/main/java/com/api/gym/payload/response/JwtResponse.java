@@ -1,37 +1,40 @@
 package com.api.gym.payload.response;
 
+import com.api.gym.enums.ERole;
+import com.api.gym.models.Role;
+import com.api.gym.models.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class JwtResponse
+public class JwtResponse extends RepresentationModel<JwtResponse>
 {
 	private String token;
 	private String type = "Bearer";
-	private Long id;
 	private String username;
 	private String lastName;
-	private String email;
-	private String phoneNumber;
-	private Date createDate;
-	private List<String> roles;
+	private String profileName;
+	private Set <Role> roles;
+	private Boolean active;
+	private Boolean emailConfirmed;
 
 
-	public JwtResponse(String accessToken, Long id, String username, String lastName,String email,String phoneNumber, Date createDate, List<String> roles)
+	public JwtResponse(String accessToken, String username, String lastName, String profileName, Set<Role> roles, Boolean active, Boolean emailConfirmed)
 	{
 		this.token = accessToken;
-		this.id = id;
 		this.username = username;
-		this.email = email;
 		this.roles = roles;
 		this.lastName = lastName;
-		this.phoneNumber = phoneNumber;
-		this.createDate = createDate;
+		this.profileName = profileName;
+		this.active = active;
+		this.emailConfirmed = emailConfirmed;
 	}
 }

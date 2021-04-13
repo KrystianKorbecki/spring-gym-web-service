@@ -74,7 +74,6 @@ public class MessagesService
             ShowAllUsers showAllUsers = new ShowAllUsers();
             showAllUsers.setName(user.getUserName());
             showAllUsers.setLastName(user.getLastName());
-            showAllUsers.setChatCode(user.getChatCode());
             showAllUsers.setRole(user.getRoles().toString());
             showAllUsersList.add(showAllUsers);
         }

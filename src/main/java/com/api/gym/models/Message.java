@@ -35,4 +35,5 @@ public class Message
 
     @Column(name = "status")
     String status;
+
 }

@@ -1,5 +1,7 @@
 package com.api.gym.models;
 
+import com.api.gym.enums.EGender;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,6 +31,7 @@ public class User extends RepresentationModel<User>
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@JsonIgnore
 	private Long id;
 
 	@NotBlank
@@ -51,6 +54,10 @@ public class User extends RepresentationModel<User>
 	@Column(name = "profile_name")
 	private String profileName;
 
+	@Size(max = 70)
+	@Column(name = "photo_name")
+	private String photoName;
+
 	@NotBlank
 	@Size(max = 50)
 	@Email
@@ -62,9 +69,6 @@ public class User extends RepresentationModel<User>
 
 	@Column(name = "confirmation_code")
 	private String confirmationCode;
-
-	@Column(name = "chat_code")
-	private String chatCode;
 
 	@NotBlank
 	@Size(max = 240)
@@ -87,7 +91,8 @@ public class User extends RepresentationModel<User>
 	private Date birthdayDate;
 
 	@Column(name = "gender")
-	private String gender;
+	@Enumerated(EnumType.STRING)
+	private EGender gender;
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(	name = "role_users",
@@ -112,4 +117,16 @@ public class User extends RepresentationModel<User>
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "id")
 	private List<Message> messages = new ArrayList<>();
+
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "id_address", referencedColumnName = "id")
+	private Address address;
+
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "id_profile", referencedColumnName = "id")
+	private Profile profile;
+
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "id_gym_address", referencedColumnName = "id")
+	private GymAddress gymAddress;
 }
