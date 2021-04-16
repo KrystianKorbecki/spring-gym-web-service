@@ -46,7 +46,7 @@ public class AdminTrainersController
 
     @GetMapping("/trainers/{pageNumber}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> showBasicUser(@PathVariable int pageNumber, @RequestParam(required = false) int pageSize)
+    public ResponseEntity<?> showTrainers(@PathVariable int pageNumber, @RequestParam(required = false) int pageSize)
     {
         if(pageSize == 0)
         {
@@ -58,7 +58,7 @@ public class AdminTrainersController
 
     @GetMapping("/trainer/{profileName}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> showBasicUsers(@PathVariable String profileName)
+    public ResponseEntity<?> showTrainer(@PathVariable String profileName)
     {
         User user = userService.findUserByProfileName(profileName);
         return ResponseEntity.ok(user);

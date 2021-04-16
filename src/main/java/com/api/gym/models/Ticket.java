@@ -19,7 +19,7 @@ public class Ticket
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @NotBlank
     @Column(name = "name_ticket")

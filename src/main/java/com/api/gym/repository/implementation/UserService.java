@@ -1,6 +1,7 @@
 package com.api.gym.repository.implementation;
 
 import com.api.gym.enums.ERole;
+import com.api.gym.exception.DatabaseException;
 import com.api.gym.exception.UserNotFoundException;
 import com.api.gym.models.Role;
 import com.api.gym.models.User;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.*;
 
 @Service
@@ -27,6 +29,42 @@ public class UserService
         this.converter= converter;
     }
 
+    public Integer countUserByCreateDate(Date date)
+    {
+        try
+        {
+            return userRepository.countUserByCreateDate(date);
+        }
+        catch (Exception e)
+        {
+            throw new DatabaseException();
+        }
+    }
+
+    public Integer countUsersByRolesIn(Set<Role> roles)
+    {
+        try
+        {
+            return userRepository.countUsersByRolesIn(roles);
+        }
+        catch (Exception e)
+        {
+            throw new DatabaseException();
+        }
+    }
+
+    public Integer countUserByCreateDateBetween(Date startDate, Date endDate)
+    {
+        try
+        {
+            return userRepository.countUserByCreateDateBetween(startDate, endDate);
+        }
+        catch (Exception e)
+        {
+            throw new DatabaseException();
+        }
+    }
+
     public User findUserByProfileName(String profileName)
     {
         return userRepository.findUserByProfileName(profileName).orElseThrow(UserNotFoundException::new);
@@ -34,17 +72,39 @@ public class UserService
 
     public Boolean existsByProfileName(String profileName)
     {
-        return userRepository.existsByProfileName(profileName);
+        try
+        {
+            return userRepository.existsByProfileName(profileName);
+        }
+        catch (Exception e)
+        {
+            throw new DatabaseException();
+        }
     }
 
     public boolean deleteByProfileName(String profileName)
     {
-        return userRepository.deleteByProfileName(profileName);
+        try
+        {
+            return userRepository.deleteByProfileName(profileName);
+        }
+        catch (Exception e)
+        {
+            throw new DatabaseException();
+        }
+
     }
 
     public Boolean existsByConfirmationCode(String confirmationCode)
     {
-        return userRepository.existsByConfirmationCode(confirmationCode);
+        try
+        {
+            return userRepository.existsByConfirmationCode(confirmationCode);
+        }
+        catch (Exception e)
+        {
+            throw new DatabaseException();
+        }
     }
 
 
@@ -55,13 +115,27 @@ public class UserService
 
     public Page<User> findAllUsersByRole(int pageNumber, int pageSize, Role role)
     {
-        Pageable pageable = PageRequest.of(pageNumber - 1 , pageSize);
-        return userRepository.findAllByRolesIn(converter.convertRoleToRolesSet(role), pageable);
+        try
+        {
+            Pageable pageable = PageRequest.of(pageNumber - 1 , pageSize);
+            return userRepository.findAllByRolesIn(converter.convertRoleToRolesSet(role), pageable);
+        }
+        catch (Exception e)
+        {
+            throw new DatabaseException();
+        }
     }
 
     public Boolean existsByEmail(String email)
     {
-        return userRepository.existsByEmail(email);
+        try
+        {
+            return userRepository.existsByEmail(email);
+        }
+        catch (Exception e)
+        {
+            throw new DatabaseException();
+        }
     }
 
     public User findUserByEmail(String email)
@@ -76,7 +150,15 @@ public class UserService
 
     public <S extends User> void saveUser(S entity)
     {
-        userRepository.save(entity);
+        try
+        {
+            userRepository.save(entity);
+        }
+        catch (Exception e)
+        {
+            throw new DatabaseException();
+        }
+
     }
 
     public List<User> findAllByRolesAndIdTrainer(Set<Role> roles, Long idTrainer)
@@ -86,7 +168,13 @@ public class UserService
 
     public List<User> findUsersByRole(Role role)
     {
-        return findAllUsersByRoles(converter.convertRoleToRolesSet(role));
+        try{
+            return findAllUsersByRoles(converter.convertRoleToRolesSet(role));
+        }
+        catch (Exception e)
+        {
+            throw new DatabaseException();
+        }
     }
 
 

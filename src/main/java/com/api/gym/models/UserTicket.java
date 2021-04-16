@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Getter
@@ -24,20 +25,20 @@ public class UserTicket
 
     @Column(name = "id_ticket")
     @NotBlank
-    private Integer idTicket;
+    private Long idTicket;
 
     @Column(name = "id_user")
     @NotBlank
-    private Integer idUser;
+    private Long idUser;
 
     @Column(name = "id_coupon")
     @NotBlank
-    private Integer idCoupon;
+    private Long idCoupon;
 
     @Column(name = "purchase_date")
-    private Date purchaseDate;
+    private Timestamp purchaseDate;
 
     @Column(name = "start_date")
     @NotBlank
-    private Date startDate;
+    private Timestamp startDate;
 }

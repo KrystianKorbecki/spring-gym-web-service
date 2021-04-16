@@ -21,13 +21,13 @@ public class Coupon
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "discount")
-    private int discount;
+    private Double discount;
 
     @Column(name = "discount_percent")
-    private int discountPercent;
+    private Integer discountPercent;
 
     @NotBlank
     @Column(name = "name", unique = true)

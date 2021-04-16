@@ -1,5 +1,6 @@
 package com.api.gym.repository;
 
+import com.api.gym.exception.DatabaseException;
 import com.api.gym.models.Role;
 import com.api.gym.models.User;
 import org.springframework.data.domain.Page;
@@ -7,10 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>
@@ -30,4 +28,8 @@ public interface UserRepository extends JpaRepository<User, Long>
 	boolean deleteByProfileName(String profileName);
 
 	Page<User> findAllByRolesIn(Set<Role> roles, Pageable pageable);
+
+	Integer countUserByCreateDate(Date date);
+	Integer countUserByCreateDateBetween(Date startDate, Date endDate);
+	Integer countUsersByRolesIn(Set<Role> roles);
 }

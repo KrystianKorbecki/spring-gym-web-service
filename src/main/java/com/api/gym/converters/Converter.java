@@ -4,6 +4,7 @@ import com.api.gym.enums.ERole;
 import com.api.gym.models.Role;
 import com.api.gym.models.User;
 import com.api.gym.payload.response.ShowUserResponse;
+import com.api.gym.repository.implementation.RoleService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -11,6 +12,13 @@ import java.util.*;
 @Service
 public class Converter
 {
+    private final RoleService roleService;
+
+    public Converter(RoleService roleService)
+    {
+        this.roleService = roleService;
+    }
+
     public Set<Role> convertRoleToRolesSet(Role role)
     {
         Set<Role> roles = new HashSet<>();
@@ -38,11 +46,16 @@ public class Converter
         return showUserResponses;
     }
 
-    public Set<ERole> convertRoleToRolesSet(ERole role)
+    public Set<ERole> convertERoleToERolesSet(ERole role)
     {
         Set<ERole> roles = new HashSet<>();
         roles.add(role);
         return roles;
+    }
+
+    public Set<Role> convertERoleToRolesSet(ERole role)
+    {
+        return convertRoleToRolesSet(roleService.findRoleByName(role));
     }
 
     public ShowUserResponse convertUserToShowUserResponse(User user)

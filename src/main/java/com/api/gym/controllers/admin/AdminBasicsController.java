@@ -38,9 +38,15 @@ public class AdminBasicsController
     }
 
 
+    /**
+     * This method show list of users with {@link ERole#ROLE_BASIC} for users with {@link ERole#ROLE_ADMIN}
+     * @param pageNumber contains number of page
+     * @param pageSize contains size of page
+     * @return {@link List} of {@link ShowUserResponse}, who shows main data about users with {@link ERole#ROLE_BASIC}
+     */
     @GetMapping("/basics/{pageNumber}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> showBasicUsers(@PathVariable int pageNumber, @RequestParam(required = false) int pageSize)
+    public ResponseEntity<List<ShowUserResponse>> showBasicUsers(@PathVariable int pageNumber, @RequestParam(required = false) int pageSize)
     {
         if(pageSize == 0)
         {

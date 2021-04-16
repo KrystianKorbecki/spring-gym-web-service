@@ -1,9 +1,7 @@
 package com.api.gym.controllers.trainer;
 
 import com.api.gym.enums.ERole;
-import com.api.gym.models.User;
 import com.api.gym.payload.request.ChangeRole;
-import com.api.gym.payload.request.EmailRequest;
 import com.api.gym.payload.response.ShowUserResponse;
 import com.api.gym.converters.Converter;
 import com.api.gym.repository.implementation.RoleService;
@@ -14,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,8 +57,8 @@ public class TrainerBasicController
     public ResponseEntity<?> addUser(@PathVariable String profileName)
     {
         ChangeRole changeRole = new ChangeRole();
-        changeRole.setAddRoles(converter.convertRoleToRolesSet(ERole.ROLE_USER));
-        changeRole.setDeleteRoles(converter.convertRoleToRolesSet(ERole.ROLE_BASIC));
+        changeRole.setAddRoles(converter.convertERoleToERolesSet(ERole.ROLE_USER));
+        changeRole.setDeleteRoles(converter.convertERoleToERolesSet(ERole.ROLE_BASIC));
         return new ResponseEntity<>(usersService.changeRoleByProfileName(profileName, changeRole, usersService.userDetails()), HttpStatus.OK);
     }
 

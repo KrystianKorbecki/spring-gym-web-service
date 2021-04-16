@@ -85,7 +85,7 @@ CREATE TABLE "schedule"
 CREATE TABLE "coupon"
 (
     "id" serial NOT NULL,
-    "discount" int,
+    "discount" decimal(5, 2),
     "discount_percent" int,
     "name" varchar(20) NOT NULL,
     "code" varchar(6) NOT NULL,
